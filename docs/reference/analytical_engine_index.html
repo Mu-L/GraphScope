@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Analytical Engine API Reference &mdash; GraphScope  documentation</title>
@@ -26,6 +27,7 @@
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="GraphScope: 一站式图计算系统" href="../zh/index.html" />
@@ -57,6 +59,10 @@
           
             
             
+              <div class="version">
+                stable
+              </div>
+            
           
 
           
@@ -80,19 +86,20 @@
         
       
       
-        <p class="caption"><span class="caption-text">Contents</span></p>
+        <p><span class="caption-text">Contents</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../loading_graph.html">Loading Graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../graph_transformation.html">Graph Transformations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../interactive_engine.html">GraphScope Interactive Engine</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analytics_engine.html">GraphScope Analytical Engine</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../learning_engine.html">GraphScope Learning Engine</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developer_guide.html">Developer Guide</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Reference</span></p>
+<p><span class="caption-text">Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="python_index.html">Python API Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Analytical Engine API Reference</a><ul>
@@ -167,7 +174,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="analytical-engine-api-reference">
+  <section id="analytical-engine-api-reference">
 <span id="reference"></span><h1>Analytical Engine API Reference<a class="headerlink" href="#analytical-engine-api-reference" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
@@ -178,7 +185,7 @@
 <li><p><a class="reference internal" href="#app-s-context" id="id5">App’s Context</a></p></li>
 </ul>
 </div>
-<div class="section" id="analytical-engine">
+<section id="analytical-engine">
 <h2><a class="toc-backref" href="#id1">Analytical Engine</a><a class="headerlink" href="#analytical-engine" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp class">
 <dt id="_CPPv4N2gs11GrapeEngineE">
@@ -530,8 +537,8 @@
 </div>
 </dd></dl>
 
-</div>
-<div class="section" id="fragments-in-graphscope">
+</section>
+<section id="fragments-in-graphscope">
 <h2><a class="toc-backref" href="#id2">Fragments in GraphScope</a><a class="headerlink" href="#fragments-in-graphscope" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp class">
 <dt id="_CPPv4I0EN2gs15FragmentWrapperE">
@@ -605,6 +612,11 @@
 <dl class="cpp type">
 <dt id="_CPPv4N2gs22ArrowProjectedFragment10adj_list_tE">
 <span id="_CPPv3N2gs22ArrowProjectedFragment10adj_list_tE"></span><span id="_CPPv2N2gs22ArrowProjectedFragment10adj_list_tE"></span><span class="target" id="classgs_1_1_arrow_projected_fragment_1a2a04ed299885ba652f0bb96315b92b0d"></span><em class="property">using </em><code class="sig-name descname">adj_list_t</code> = arrow_projected_fragment_impl::AdjList&lt;<a class="reference internal" href="#_CPPv4N2gs22ArrowProjectedFragment5vid_tE" title="gs::ArrowProjectedFragment::vid_t">vid_t</a>, <a class="reference internal" href="#_CPPv4N2gs22ArrowProjectedFragment5eid_tE" title="gs::ArrowProjectedFragment::eid_t">eid_t</a>, <a class="reference internal" href="#_CPPv4I0000EN2gs22ArrowProjectedFragmentE" title="gs::ArrowProjectedFragment::EDATA_T">EDATA_T</a>&gt;<a class="headerlink" href="#_CPPv4N2gs22ArrowProjectedFragment10adj_list_tE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt id="_CPPv4N2gs22ArrowProjectedFragment16const_adj_list_tE">
+<span id="_CPPv3N2gs22ArrowProjectedFragment16const_adj_list_tE"></span><span id="_CPPv2N2gs22ArrowProjectedFragment16const_adj_list_tE"></span><span class="target" id="classgs_1_1_arrow_projected_fragment_1a4f93fac89c12ffe6daf0195967ba435c"></span><em class="property">using </em><code class="sig-name descname">const_adj_list_t</code> = arrow_projected_fragment_impl::AdjList&lt;<a class="reference internal" href="#_CPPv4N2gs22ArrowProjectedFragment5vid_tE" title="gs::ArrowProjectedFragment::vid_t">vid_t</a>, <a class="reference internal" href="#_CPPv4N2gs22ArrowProjectedFragment5eid_tE" title="gs::ArrowProjectedFragment::eid_t">eid_t</a>, <a class="reference internal" href="#_CPPv4I0000EN2gs22ArrowProjectedFragmentE" title="gs::ArrowProjectedFragment::EDATA_T">EDATA_T</a>&gt;<a class="headerlink" href="#_CPPv4N2gs22ArrowProjectedFragment16const_adj_list_tE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp type">
@@ -1352,13 +1364,48 @@
 <dd></dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N2gs19ArrowFragmentLoader16LoadVertexTablesEv">
+<span id="_CPPv3N2gs19ArrowFragmentLoader16LoadVertexTablesEv"></span><span id="_CPPv2N2gs19ArrowFragmentLoader16LoadVertexTablesEv"></span><span id="gs::ArrowFragmentLoader::LoadVertexTables"></span><span class="target" id="classgs_1_1_arrow_fragment_loader_1a97ee099d80403039835cdbd2a2ddf538"></span>boost::leaf::result&lt;std::vector&lt;std::shared_ptr&lt;arrow::Table&gt;&gt;&gt; <code class="sig-name descname">LoadVertexTables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2gs19ArrowFragmentLoader16LoadVertexTablesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N2gs19ArrowFragmentLoader14LoadEdgeTablesEv">
+<span id="_CPPv3N2gs19ArrowFragmentLoader14LoadEdgeTablesEv"></span><span id="_CPPv2N2gs19ArrowFragmentLoader14LoadEdgeTablesEv"></span><span id="gs::ArrowFragmentLoader::LoadEdgeTables"></span><span class="target" id="classgs_1_1_arrow_fragment_loader_1ab482b1084c878f179af407f70e623a23"></span>boost::leaf::result&lt;std::vector&lt;std::vector&lt;std::shared_ptr&lt;arrow::Table&gt;&gt;&gt;&gt; <code class="sig-name descname">LoadEdgeTables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2gs19ArrowFragmentLoader14LoadEdgeTablesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N2gs19ArrowFragmentLoader11AddVerticesEN8vineyard8ObjectIDE">
+<span id="_CPPv3N2gs19ArrowFragmentLoader11AddVerticesEN8vineyard8ObjectIDE"></span><span id="_CPPv2N2gs19ArrowFragmentLoader11AddVerticesEN8vineyard8ObjectIDE"></span><span id="gs::ArrowFragmentLoader::AddVertices__vineyard::ObjectID"></span><span class="target" id="classgs_1_1_arrow_fragment_loader_1a7ed4c8ffd0bb56dc671b508f46cbe4f6"></span>boost::leaf::result&lt;vineyard::ObjectID&gt; <code class="sig-name descname">AddVertices</code><span class="sig-paren">(</span>vineyard::ObjectID <em>frag_id</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2gs19ArrowFragmentLoader11AddVerticesEN8vineyard8ObjectIDE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N2gs19ArrowFragmentLoader8AddEdgesEN8vineyard8ObjectIDE">
+<span id="_CPPv3N2gs19ArrowFragmentLoader8AddEdgesEN8vineyard8ObjectIDE"></span><span id="_CPPv2N2gs19ArrowFragmentLoader8AddEdgesEN8vineyard8ObjectIDE"></span><span id="gs::ArrowFragmentLoader::AddEdges__vineyard::ObjectID"></span><span class="target" id="classgs_1_1_arrow_fragment_loader_1ab47fd4606f5ece8ab845a22412feae08"></span>boost::leaf::result&lt;vineyard::ObjectID&gt; <code class="sig-name descname">AddEdges</code><span class="sig-paren">(</span>vineyard::ObjectID <em>frag_id</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2gs19ArrowFragmentLoader8AddEdgesEN8vineyard8ObjectIDE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N2gs19ArrowFragmentLoader12LoadFragmentEv">
 <span id="_CPPv3N2gs19ArrowFragmentLoader12LoadFragmentEv"></span><span id="_CPPv2N2gs19ArrowFragmentLoader12LoadFragmentEv"></span><span id="gs::ArrowFragmentLoader::LoadFragment"></span><span class="target" id="classgs_1_1_arrow_fragment_loader_1ad1cf0692ffd0b3e92f34a57d92b273ff"></span>boost::leaf::result&lt;vineyard::ObjectID&gt; <code class="sig-name descname">LoadFragment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2gs19ArrowFragmentLoader12LoadFragmentEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
+<dt id="_CPPv4N2gs19ArrowFragmentLoader26AddVerticesAsFragmentGroupEN8vineyard8ObjectIDE">
+<span id="_CPPv3N2gs19ArrowFragmentLoader26AddVerticesAsFragmentGroupEN8vineyard8ObjectIDE"></span><span id="_CPPv2N2gs19ArrowFragmentLoader26AddVerticesAsFragmentGroupEN8vineyard8ObjectIDE"></span><span id="gs::ArrowFragmentLoader::AddVerticesAsFragmentGroup__vineyard::ObjectID"></span><span class="target" id="classgs_1_1_arrow_fragment_loader_1ab564260998240c6c0efa32bca710dc1f"></span>boost::leaf::result&lt;vineyard::ObjectID&gt; <code class="sig-name descname">AddVerticesAsFragmentGroup</code><span class="sig-paren">(</span>vineyard::ObjectID <em>frag_id</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2gs19ArrowFragmentLoader26AddVerticesAsFragmentGroupEN8vineyard8ObjectIDE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N2gs19ArrowFragmentLoader23AddEdgesAsFragmentGroupEN8vineyard8ObjectIDE">
+<span id="_CPPv3N2gs19ArrowFragmentLoader23AddEdgesAsFragmentGroupEN8vineyard8ObjectIDE"></span><span id="_CPPv2N2gs19ArrowFragmentLoader23AddEdgesAsFragmentGroupEN8vineyard8ObjectIDE"></span><span id="gs::ArrowFragmentLoader::AddEdgesAsFragmentGroup__vineyard::ObjectID"></span><span class="target" id="classgs_1_1_arrow_fragment_loader_1a6812302d9c3a2b44476ec9df3c6070f7"></span>boost::leaf::result&lt;vineyard::ObjectID&gt; <code class="sig-name descname">AddEdgesAsFragmentGroup</code><span class="sig-paren">(</span>vineyard::ObjectID <em>frag_id</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2gs19ArrowFragmentLoader23AddEdgesAsFragmentGroupEN8vineyard8ObjectIDE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
 <dt id="_CPPv4N2gs19ArrowFragmentLoader27LoadFragmentAsFragmentGroupEv">
 <span id="_CPPv3N2gs19ArrowFragmentLoader27LoadFragmentAsFragmentGroupEv"></span><span id="_CPPv2N2gs19ArrowFragmentLoader27LoadFragmentAsFragmentGroupEv"></span><span id="gs::ArrowFragmentLoader::LoadFragmentAsFragmentGroup"></span><span class="target" id="classgs_1_1_arrow_fragment_loader_1a848be16da492133abda993c39134928b"></span>boost::leaf::result&lt;vineyard::ObjectID&gt; <code class="sig-name descname">LoadFragmentAsFragmentGroup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2gs19ArrowFragmentLoader27LoadFragmentAsFragmentGroupEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N2gs19ArrowFragmentLoader15initPartitionerEv">
+<span id="_CPPv3N2gs19ArrowFragmentLoader15initPartitionerEv"></span><span id="_CPPv2N2gs19ArrowFragmentLoader15initPartitionerEv"></span><span id="gs::ArrowFragmentLoader::initPartitioner"></span><span class="target" id="classgs_1_1_arrow_fragment_loader_1a97fee4780d1b060d93882378ccc565f6"></span>boost::leaf::result&lt;partitioner_t&gt; <code class="sig-name descname">initPartitioner</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2gs19ArrowFragmentLoader15initPartitionerEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 </div>
@@ -1532,8 +1579,8 @@
 </div>
 </dd></dl>
 
-</div>
-<div class="section" id="analytical-apps">
+</section>
+<section id="analytical-apps">
 <h2><a class="toc-backref" href="#id3">Analytical Apps</a><a class="headerlink" href="#analytical-apps" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp class">
 <dt id="_CPPv4I00EN2gs7AppBaseE">
@@ -2050,8 +2097,8 @@
 <span id="_CPPv3I_NSt6size_tE0EN2gs9ArgTypeAtE"></span><span id="_CPPv2I_NSt6size_tE0EN2gs9ArgTypeAtE"></span>template&lt;std::size_t <code class="sig-name descname">index</code>, class <code class="sig-name descname">FunctionType</code>&gt;<br /><span class="target" id="structgs_1_1_arg_type_at"></span><em class="property">struct </em><code class="sig-name descname">ArgTypeAt</code><a class="headerlink" href="#_CPPv4I_NSt6size_tE0EN2gs9ArgTypeAtE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
-</div>
-<div class="section" id="analytical-workers">
+</section>
+<section id="analytical-workers">
 <h2><a class="toc-backref" href="#id4">Analytical Workers</a><a class="headerlink" href="#analytical-workers" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp class">
 <dt>
@@ -2329,8 +2376,8 @@ template&lt;class ...<code class="sig-name descname">Args</code>&gt;<br /><span 
 </div>
 </dd></dl>
 
-</div>
-<div class="section" id="app-s-context">
+</section>
+<section id="app-s-context">
 <h2><a class="toc-backref" href="#id5">App’s Context</a><a class="headerlink" href="#app-s-context" title="Permalink to this headline">¶</a></h2>
 <dl class="cpp struct">
 <dt id="_CPPv4I00EN2gs17CtxWrapperBuilderE">
@@ -2598,8 +2645,8 @@ template&lt;class ...<code class="sig-name descname">Args</code>&gt;<br /><span 
 </div>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -2661,18 +2708,102 @@ template&lt;class ...<code class="sig-name descname">Args</code>&gt;<br /><span 
   </script>
   
 
-  <div class="rst-versions shift-up" data-toggle="rst-versions" role="note" aria-label="versions">
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       <span class="fa fa-book"> Read the Docs</span>
-      v: latest
+      v: stable
       <span class="fa fa-caret-down"></span>
     </span>
     <div class="rst-other-versions">
+      <dl>
+        <dt>Versions</dt>
+        
+          
+
+            
+              
+                <dd><a href="../latest/index.html">latest</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../index.html">stable</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../v0.2.0/index.html">v0.2.0</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../v0.1.3/index.html">v0.1.3</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../v0.1.2/index.html">v0.1.2</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../v0.1.1/index.html">v0.1.1</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../v0.1.0/index.html">v0.1.0</a></dd>
+              
+            
+
+          
+        
+      </dl>
+    </div>
+  </div>
+
+  <div class="rst-languages shift-up" role="note" aria-label="languages">
+    <div class="rst-other-languages">
       <dl>
         <dt>Languages</dt>
         <dd><a href="../index.html">en</a></dd>
         <dd><a href="../zh/index.html">zh_CN</a></dd>
       </dl>
+
+      <hr />
+      <small>
+        <span>Hosted by <a href="https://pages.github.com/">Github Pages</a>.</span>
+      </small>
     </div>
   </div>
 

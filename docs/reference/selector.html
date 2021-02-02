@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Selector &mdash; GraphScope  documentation</title>
@@ -26,6 +27,7 @@
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Operation" href="operation.html" />
@@ -57,6 +59,10 @@
           
             
             
+              <div class="version">
+                stable
+              </div>
+            
           
 
           
@@ -80,19 +86,20 @@
         
       
       
-        <p class="caption"><span class="caption-text">Contents</span></p>
+        <p><span class="caption-text">Contents</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../loading_graph.html">Loading Graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../graph_transformation.html">Graph Transformations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../interactive_engine.html">GraphScope Interactive Engine</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analytics_engine.html">GraphScope Analytical Engine</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../learning_engine.html">GraphScope Learning Engine</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developer_guide.html">Developer Guide</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Reference</span></p>
+<p><span class="caption-text">Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="python_index.html">Python API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="session.html">Session</a></li>
@@ -105,7 +112,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#vertexdatacontext">VertexDataContext</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#labeledvertexdatacontext">LabeledVertexDataContext</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#vertexpropertycontext">VertexPropertyContext</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#labelvertexpropertycontext">LabelVertexPropertyContext</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#labeledvertexpropertycontext">LabeledVertexPropertyContext</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#methods-that-use-selectors">Methods that use selectors</a><ul>
@@ -190,23 +197,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="selector">
+  <section id="selector">
 <span id="id1"></span><h1>Selector<a class="headerlink" href="#selector" title="Permalink to this headline">¶</a></h1>
 <p>Selectors are strs, or key-value pairs that used for <a class="reference internal" href="networkx/graphs.html#graph"><span class="std std-ref">Graph</span></a>, or <a class="reference internal" href="context.html#context"><span class="std std-ref">Context</span></a>. Selectors are intended to be used to specify a subset of data of objects, they can not only retrieve the results of algorithms, but also elements on
 the graph itself. The syntax of selectors slightly differ from each other For different kinds of graphs or contexts. Since we have 5 kinds of context, let’s talk about them one by one.</p>
-<div class="section" id="selectors-in-different-context">
+<section id="selectors-in-different-context">
 <h2>Selectors in different context<a class="headerlink" href="#selectors-in-different-context" title="Permalink to this headline">¶</a></h2>
 <p>The basic components of selector is <cite>v</cite>, <cite>e</cite>, and <cite>r</cite>, means vertex, edge and result, respectively.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Selectors on edges is not supported yet, but will be supported in next releases.</p>
 </div>
-<div class="section" id="tensorcontext">
+<section id="tensorcontext">
 <h3>TensorContext<a class="headerlink" href="#tensorcontext" title="Permalink to this headline">¶</a></h3>
 <p><code class="xref py py-class docutils literal notranslate"><span class="pre">TensorContext</span></code> holds a tensor inside the engine. In this case, selectors doesn’t matter,
 instead, we have an <cite>axis</cite> keyword that used to retrieve datas in the tensor respect to axis.</p>
-</div>
-<div class="section" id="vertexdatacontext">
+</section>
+<section id="vertexdatacontext">
 <h3>VertexDataContext<a class="headerlink" href="#vertexdatacontext" title="Permalink to this headline">¶</a></h3>
 <p><code class="xref py py-class docutils literal notranslate"><span class="pre">VertexDataContext</span></code> is used by algorithms that compatible graph is a simple graph,
 i.e. no labels and property, and result of the algorithms has the form that
@@ -240,8 +247,8 @@ Let’s see what selectors of <code class="xref py py-class docutils literal not
 </li>
 </ul>
 </div></blockquote>
-</div>
-<div class="section" id="labeledvertexdatacontext">
+</section>
+<section id="labeledvertexdatacontext">
 <h3>LabeledVertexDataContext<a class="headerlink" href="#labeledvertexdatacontext" title="Permalink to this headline">¶</a></h3>
 <p><code class="xref py py-class docutils literal notranslate"><span class="pre">LabeledVertexDataContext</span></code> is used by algorithms that compatible graphs is a property graph,
 i.e. There are several labels in the graph, and each label has several properties, And results of
@@ -278,8 +285,8 @@ But the results has no property, only have labels.</p>
 </li>
 </ul>
 </div></blockquote>
-</div>
-<div class="section" id="vertexpropertycontext">
+</section>
+<section id="vertexpropertycontext">
 <h3>VertexPropertyContext<a class="headerlink" href="#vertexpropertycontext" title="Permalink to this headline">¶</a></h3>
 <p><code class="xref py py-class docutils literal notranslate"><span class="pre">VertexPropertyContext</span></code> is used by algorithms that compatible graph is a simple graph,
 i.e. no labels and property, and results of algorithms can have multiple datas (properties) on each vertex,
@@ -313,9 +320,9 @@ such as <a class="reference internal" href="app.html#graphscope.hits" title="gra
 </li>
 </ul>
 </div></blockquote>
-</div>
-<div class="section" id="labelvertexpropertycontext">
-<h3>LabelVertexPropertyContext<a class="headerlink" href="#labelvertexpropertycontext" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="labeledvertexpropertycontext">
+<h3>LabeledVertexPropertyContext<a class="headerlink" href="#labeledvertexpropertycontext" title="Permalink to this headline">¶</a></h3>
 <p><code class="xref py py-class docutils literal notranslate"><span class="pre">LabeledVertexPropertyContext</span></code> is used by algorithms that compatible graphs is a property graph.
 i.e. There are several labels in the graph, and each label has several properties.
 And results of the algorithms would has the form that each label can have multiple datas (a.k.a. property).</p>
@@ -350,12 +357,12 @@ And results of the algorithms would has the form that each label can have multip
 </li>
 </ul>
 </div></blockquote>
-</div>
-</div>
-<div class="section" id="methods-that-use-selectors">
+</section>
+</section>
+<section id="methods-that-use-selectors">
 <h2>Methods that use selectors<a class="headerlink" href="#methods-that-use-selectors" title="Permalink to this headline">¶</a></h2>
 <p>The form of the selector is slightly different in different methods,</p>
-<div class="section" id="one-dimensional-results">
+<section id="one-dimensional-results">
 <h3>One-dimensional results<a class="headerlink" href="#one-dimensional-results" title="Permalink to this headline">¶</a></h3>
 <p>Methods that return one-dimensional results are:</p>
 <blockquote>
@@ -376,8 +383,8 @@ And results of the algorithms would has the form that each label can have multip
 <span class="n">context</span><span class="o">.</span><span class="n">to_vineyard_tensor</span><span class="p">(</span><span class="s1">&#39;r.person.rank&#39;</span><span class="p">)</span>  <span class="c1"># LabeledVertexPropertyContext</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="multi-dimensional-results">
+</section>
+<section id="multi-dimensional-results">
 <h3>Multi-dimensional results<a class="headerlink" href="#multi-dimensional-results" title="Permalink to this headline">¶</a></h3>
 <p>To retrieve multi-dimensional results, we must assign a key for each selector.
 Also, Each Key must be unique for a given selector.</p>
@@ -400,9 +407,9 @@ Also, Each Key must be unique for a given selector.</p>
 <span class="n">context</span><span class="o">.</span><span class="n">output_to_client</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;person_id&#39;</span><span class="p">:</span> <span class="s1">&#39;v.person.id&#39;</span><span class="p">,</span> <span class="s1">&#39;res&#39;</span><span class="p">:</span> <span class="s1">&#39;r.person.res&#39;</span><span class="p">})</span>  <span class="c1"># LabeledVertexPropertyContext</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="vertex-range">
+</section>
+</section>
+<section id="vertex-range">
 <h2>Vertex Range<a class="headerlink" href="#vertex-range" title="Permalink to this headline">¶</a></h2>
 <p>Optional, user may also want to retrieve only a subset of data specified by selector.
 Those method above can take a optional <cite>vertex_range</cite> argument, which works like slicing,
@@ -415,8 +422,8 @@ user can specify a <cite>begin</cite> and an <cite>end</cite> value, then only v
 <p class="admonition-title">Note</p>
 <p>Values of vertex_range is compared with vertex ID, in alphabetical order, not numeric order.</p>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -478,18 +485,102 @@ user can specify a <cite>begin</cite> and an <cite>end</cite> value, then only v
   </script>
   
 
-  <div class="rst-versions shift-up" data-toggle="rst-versions" role="note" aria-label="versions">
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       <span class="fa fa-book"> Read the Docs</span>
-      v: latest
+      v: stable
       <span class="fa fa-caret-down"></span>
     </span>
     <div class="rst-other-versions">
+      <dl>
+        <dt>Versions</dt>
+        
+          
+
+            
+              
+                <dd><a href="../latest/index.html">latest</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../index.html">stable</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../v0.2.0/index.html">v0.2.0</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../v0.1.3/index.html">v0.1.3</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../v0.1.2/index.html">v0.1.2</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../v0.1.1/index.html">v0.1.1</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../v0.1.0/index.html">v0.1.0</a></dd>
+              
+            
+
+          
+        
+      </dl>
+    </div>
+  </div>
+
+  <div class="rst-languages shift-up" role="note" aria-label="languages">
+    <div class="rst-other-languages">
       <dl>
         <dt>Languages</dt>
         <dd><a href="../index.html">en</a></dd>
         <dd><a href="../zh/index.html">zh_CN</a></dd>
       </dl>
+
+      <hr />
+      <small>
+        <span>Hosted by <a href="https://pages.github.com/">Github Pages</a>.</span>
+      </small>
     </div>
   </div>
 

@@ -5,7 +5,8 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Analytical App &mdash; GraphScope  documentation</title>
@@ -26,6 +27,7 @@
 
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="graphscope.framework.app.load_app" href="generated/graphscope.framework.app.load_app.html" />
@@ -57,6 +59,10 @@
           
             
             
+              <div class="version">
+                stable
+              </div>
+            
           
 
           
@@ -80,19 +86,20 @@
         
       
       
-        <p class="caption"><span class="caption-text">Contents</span></p>
+        <p><span class="caption-text">Contents</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../deployment.html">Deployment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../loading_graph.html">Loading Graphs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../graph_transformation.html">Graph Transformations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../interactive_engine.html">GraphScope Interactive Engine</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analytics_engine.html">GraphScope Analytical Engine</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../learning_engine.html">GraphScope Learning Engine</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../developer_guide.html">Developer Guide</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Reference</span></p>
+<p><span class="caption-text">Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="python_index.html">Python API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="session.html">Session</a></li>
@@ -183,9 +190,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="analytical-app">
+  <section id="analytical-app">
 <span id="app"></span><h1>Analytical App<a class="headerlink" href="#analytical-app" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="appassets">
+<section id="appassets">
 <h2>AppAssets<a class="headerlink" href="#appassets" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="graphscope.framework.app.AppAssets">
@@ -252,6 +259,12 @@ Default to None</p></li>
 </ul>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="graphscope.framework.app.AppAssets.__repr__">
+<code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/graphscope/framework/app.html#AppAssets.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#graphscope.framework.app.AppAssets.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return repr(self).</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -338,8 +351,8 @@ Default to None</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="builtin-apps">
+</section>
+<section id="builtin-apps">
 <h2>BuiltIn apps<a class="headerlink" href="#builtin-apps" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="graphscope.bfs">
@@ -361,9 +374,9 @@ Default to None</p></li>
 </dl>
 <p>Examples:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graphscope</span> <span class="kn">as</span> <span class="nn">gs</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
-<span class="n">g</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="s1">&#39;The parameters for loading a graph...&#39;</span><span class="p">)</span>
-<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project_to_simple</span><span class="p">(</span><span class="n">v_label</span><span class="o">=</span><span class="s1">&#39;vlabel&#39;</span><span class="p">,</span> <span class="n">e_label</span><span class="o">=</span><span class="s1">&#39;elabel&#39;</span><span class="p">)</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">vertices</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;vlabel&quot;</span><span class="p">:</span> <span class="p">[]},</span> <span class="n">edges</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;elabel&quot;</span><span class="p">:</span> <span class="p">[]})</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">bfs</span><span class="p">(</span><span class="n">pg</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>  <span class="c1"># use 6 as source vertex</span>
 <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
@@ -391,10 +404,10 @@ Default to None</p></li>
 </dl>
 <p>Examples:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graphscope</span> <span class="kn">as</span> <span class="nn">gs</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
-<span class="n">g</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="s1">&#39;The parameters for loading a graph...&#39;</span><span class="p">)</span>
-<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project_to_simple</span><span class="p">(</span><span class="n">v_label</span><span class="o">=</span><span class="s1">&#39;vlabel&#39;</span><span class="p">,</span> <span class="n">e_label</span><span class="o">=</span><span class="s1">&#39;elabel&#39;</span><span class="p">)</span>
-<span class="n">r</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">k_core</span><span class="p">(</span><span class="n">pg</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">max_round</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">vertices</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;vlabel&quot;</span><span class="p">:</span> <span class="p">[]},</span> <span class="n">edges</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;elabel&quot;</span><span class="p">:</span> <span class="p">[]})</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">pagerank</span><span class="p">(</span><span class="n">pg</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.85</span><span class="p">,</span> <span class="n">max_round</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -420,9 +433,9 @@ Default to None</p></li>
 </dl>
 <p>Examples:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graphscope</span> <span class="kn">as</span> <span class="nn">gs</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
-<span class="n">g</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="s1">&#39;The parameters for loading a graph...&#39;</span><span class="p">)</span>
-<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project_to_simple</span><span class="p">(</span><span class="n">v_label</span><span class="o">=</span><span class="s1">&#39;vlabel&#39;</span><span class="p">,</span> <span class="n">e_label</span><span class="o">=</span><span class="s1">&#39;elabel&#39;</span><span class="p">,</span> <span class="n">v_prop</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">e_prop</span><span class="o">=</span><span class="s1">&#39;distance&#39;</span><span class="p">)</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">vertices</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;vlabel&quot;</span><span class="p">:</span> <span class="p">[]},</span> <span class="n">edges</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;elabel&quot;</span><span class="p">:</span> <span class="p">[]})</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">sssp</span><span class="p">(</span><span class="n">pg</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
@@ -446,9 +459,9 @@ Default to None</p></li>
 </dl>
 <p>Examples:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graphscope</span> <span class="kn">as</span> <span class="nn">gs</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
-<span class="n">g</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="s1">&#39;The parameters for loading a graph...&#39;</span><span class="p">)</span>
-<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project_to_simple</span><span class="p">(</span><span class="n">v_label</span><span class="o">=</span><span class="s1">&#39;vlabel&#39;</span><span class="p">,</span> <span class="n">e_label</span><span class="o">=</span><span class="s1">&#39;elabel&#39;</span><span class="p">)</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">vertices</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;vlabel&quot;</span><span class="p">:</span> <span class="p">[]},</span> <span class="n">edges</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;elabel&quot;</span><span class="p">:</span> <span class="p">[]})</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">wcc</span><span class="p">(</span><span class="n">pg</span><span class="p">)</span>
 <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
@@ -475,9 +488,9 @@ Default to None</p></li>
 </dl>
 <p>Examples:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graphscope</span> <span class="kn">as</span> <span class="nn">gs</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
-<span class="n">g</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="s1">&#39;The parameters for loading a graph...&#39;</span><span class="p">)</span>
-<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project_to_simple</span><span class="p">(</span><span class="n">v_label</span><span class="o">=</span><span class="s1">&#39;vlabel&#39;</span><span class="p">,</span> <span class="n">e_label</span><span class="o">=</span><span class="s1">&#39;elabel&#39;</span><span class="p">)</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">vertices</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;vlabel&quot;</span><span class="p">:</span> <span class="p">[]},</span> <span class="n">edges</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;elabel&quot;</span><span class="p">:</span> <span class="p">[]})</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">cdlp</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">max_round</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
@@ -503,9 +516,9 @@ other.</p>
 </dl>
 <p>Examples:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graphscope</span> <span class="kn">as</span> <span class="nn">gs</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
-<span class="n">g</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="s1">&#39;The parameters for loading a graph...&#39;</span><span class="p">)</span>
-<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project_to_simple</span><span class="p">(</span><span class="n">v_label</span><span class="o">=</span><span class="s1">&#39;vlabel&#39;</span><span class="p">,</span> <span class="n">e_label</span><span class="o">=</span><span class="s1">&#39;elabel&#39;</span><span class="p">)</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">vertices</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;vlabel&quot;</span><span class="p">:</span> <span class="p">[]},</span> <span class="n">edges</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;elabel&quot;</span><span class="p">:</span> <span class="p">[]})</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">clustering</span><span class="p">(</span><span class="n">pg</span><span class="p">)</span>
 <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
@@ -535,9 +548,9 @@ Defaults to “both”.</p></li>
 </dl>
 <p>Examples:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graphscope</span> <span class="kn">as</span> <span class="nn">gs</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
-<span class="n">g</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="s1">&#39;The parameters for loading a graph...&#39;</span><span class="p">)</span>
-<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project_to_simple</span><span class="p">(</span><span class="n">v_label</span><span class="o">=</span><span class="s2">&quot;vlabel&quot;</span><span class="p">,</span> <span class="n">e_label</span><span class="o">=</span><span class="s2">&quot;elabel&quot;</span><span class="p">)</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">vertices</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;vlabel&quot;</span><span class="p">:</span> <span class="p">[]},</span> <span class="n">edges</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;elabel&quot;</span><span class="p">:</span> <span class="p">[]})</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">degree_centrality</span><span class="p">(</span><span class="n">pg</span><span class="p">,</span> <span class="n">centrality_type</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">)</span>
 <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
@@ -567,9 +580,9 @@ See more about eigenvector centrality here:
 </dl>
 <p>Examples:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graphscope</span> <span class="kn">as</span> <span class="nn">gs</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
-<span class="n">g</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="s1">&#39;The parameters for loading a graph...&#39;</span><span class="p">)</span>
-<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project_to_simple</span><span class="p">(</span><span class="n">v_label</span><span class="o">=</span><span class="s1">&#39;vlabel&#39;</span><span class="p">,</span> <span class="n">e_label</span><span class="o">=</span><span class="s1">&#39;elabel&#39;</span><span class="p">)</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">vertices</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;vlabel&quot;</span><span class="p">:</span> <span class="p">[]},</span> <span class="n">edges</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;elabel&quot;</span><span class="p">:</span> <span class="p">[]})</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">eigenvector_centrality</span><span class="p">(</span><span class="n">pg</span><span class="p">)</span>
 <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
@@ -601,9 +614,9 @@ is a link analysis algorithm that rates Web pages. See more here:
 </dl>
 <p>Examples:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graphscope</span> <span class="kn">as</span> <span class="nn">gs</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
-<span class="n">g</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="s1">&#39;The parameters for loading a graph...&#39;</span><span class="p">)</span>
-<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project_to_simple</span><span class="p">(</span><span class="n">v_label</span><span class="o">=</span><span class="s1">&#39;vlabel&#39;</span><span class="p">,</span> <span class="n">e_label</span><span class="o">=</span><span class="s1">&#39;elabel&#39;</span><span class="p">)</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">vertices</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;vlabel&quot;</span><span class="p">:</span> <span class="p">[]},</span> <span class="n">edges</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;elabel&quot;</span><span class="p">:</span> <span class="p">[]})</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">hits</span><span class="p">(</span><span class="n">pg</span><span class="p">)</span>
 <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
@@ -632,9 +645,9 @@ all vertices of degree less than <cite>k</cite> have been removed.</p>
 </dl>
 <p>Examples:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graphscope</span> <span class="kn">as</span> <span class="nn">gs</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
-<span class="n">g</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="s1">&#39;The parameters for loading a graph...&#39;</span><span class="p">)</span>
-<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project_to_simple</span><span class="p">(</span><span class="n">v_label</span><span class="o">=</span><span class="s1">&#39;vlabel&#39;</span><span class="p">,</span> <span class="n">e_label</span><span class="o">=</span><span class="s1">&#39;elabel&#39;</span><span class="p">)</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">vertices</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;vlabel&quot;</span><span class="p">:</span> <span class="p">[]},</span> <span class="n">edges</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;elabel&quot;</span><span class="p">:</span> <span class="p">[]})</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">k_core</span><span class="p">(</span><span class="n">pg</span><span class="p">)</span>
 <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
@@ -667,9 +680,9 @@ all vertices of degree less than <cite>k</cite> have been removed.</p>
 </dl>
 <p>Examples:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graphscope</span> <span class="kn">as</span> <span class="nn">gs</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
-<span class="n">g</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="s1">&#39;The parameters for loading a graph...&#39;</span><span class="p">)</span>
-<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project_to_simple</span><span class="p">(</span><span class="n">v_label</span><span class="o">=</span><span class="s1">&#39;vlabel&#39;</span><span class="p">,</span> <span class="n">e_label</span><span class="o">=</span><span class="s1">&#39;elabel&#39;</span><span class="p">)</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">vertices</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;vlabel&quot;</span><span class="p">:</span> <span class="p">[]},</span> <span class="n">edges</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;elabel&quot;</span><span class="p">:</span> <span class="p">[]})</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">katz_centrality</span><span class="p">(</span><span class="n">pg</span><span class="p">)</span>
 <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
@@ -696,8 +709,8 @@ all vertices of degree less than <cite>k</cite> have been removed.</p>
 </dl>
 <p>Examples:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graphscope</span> <span class="kn">as</span> <span class="nn">gs</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
-<span class="n">g</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="s1">&#39;The parameters for loading a graph...&#39;</span><span class="p">)</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">lpa</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
 <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
@@ -721,17 +734,17 @@ all vertices of degree less than <cite>k</cite> have been removed.</p>
 </dl>
 <p>Examples:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">graphscope</span> <span class="kn">as</span> <span class="nn">gs</span>
-<span class="n">s</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
-<span class="n">g</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_from</span><span class="p">(</span><span class="s1">&#39;The parameters for loading a graph...&#39;</span><span class="p">)</span>
-<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project_to_simple</span><span class="p">(</span><span class="n">v_label</span><span class="o">=</span><span class="s1">&#39;vlabel&#39;</span><span class="p">,</span> <span class="n">e_label</span><span class="o">=</span><span class="s1">&#39;elabel&#39;</span><span class="p">)</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">session</span><span class="p">()</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">g</span><span class="p">()</span>
+<span class="n">pg</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">vertices</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;vlabel&quot;</span><span class="p">:</span> <span class="p">[]},</span> <span class="n">edges</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;elabel&quot;</span><span class="p">:</span> <span class="p">[]})</span>
 <span class="n">r</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">triangles</span><span class="p">(</span><span class="n">pg</span><span class="p">)</span>
 <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
 </dd></dl>
 
-</div>
-<div class="section" id="app-object">
+</section>
+<section id="app-object">
 <h2>App object<a class="headerlink" href="#app-object" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="graphscope.framework.app.App">
@@ -900,8 +913,8 @@ set by analytical engine after library is built.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="functions">
+</section>
+<section id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
 <table class="longtable docutils align-default">
 <colgroup>
@@ -914,8 +927,8 @@ set by analytical engine after library is built.</p>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -977,18 +990,102 @@ set by analytical engine after library is built.</p>
   </script>
   
 
-  <div class="rst-versions shift-up" data-toggle="rst-versions" role="note" aria-label="versions">
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
     <span class="rst-current-version" data-toggle="rst-current-version">
       <span class="fa fa-book"> Read the Docs</span>
-      v: latest
+      v: stable
       <span class="fa fa-caret-down"></span>
     </span>
     <div class="rst-other-versions">
+      <dl>
+        <dt>Versions</dt>
+        
+          
+
+            
+              
+                <dd><a href="../latest/index.html">latest</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../index.html">stable</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../v0.2.0/index.html">v0.2.0</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../v0.1.3/index.html">v0.1.3</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../v0.1.2/index.html">v0.1.2</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../v0.1.1/index.html">v0.1.1</a></dd>
+              
+            
+
+          
+        
+          
+
+            
+              
+                <dd><a href="../v0.1.0/index.html">v0.1.0</a></dd>
+              
+            
+
+          
+        
+      </dl>
+    </div>
+  </div>
+
+  <div class="rst-languages shift-up" role="note" aria-label="languages">
+    <div class="rst-other-languages">
       <dl>
         <dt>Languages</dt>
         <dd><a href="../index.html">en</a></dd>
         <dd><a href="../zh/index.html">zh_CN</a></dd>
       </dl>
+
+      <hr />
+      <small>
+        <span>Hosted by <a href="https://pages.github.com/">Github Pages</a>.</span>
+      </small>
     </div>
   </div>
 
