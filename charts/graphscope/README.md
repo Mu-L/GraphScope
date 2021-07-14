@@ -8,12 +8,44 @@ GraphScope charts
 ## Get Repo Info
 
 ```shell
-$ helm repo add graphscope https://dl.bintray.com/graphscope/charts/
+$ helm repo add graphscope https://graphscope.oss-cn-beijing.aliyuncs.com/charts/
 $ helm repo update
 ```
 See [*helm repo*](https://helm.sh/docs/helm/helm_repo/) for command documentation.
 
 ## Install Chart
+
+GraphScope rely on some permissions to delete resources.
+
+```shell
+# example for `default` ServiceAccount with `default` namespace
+$ cat role_and_binding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: grole
+  namespace: default
+rules:
+- apiGroups: ["apps", ""]
+  resources: ["configmaps", "deployments", "deployments/status", "endpoints", "events", "pods", "pods/log", "pods/exec", "pods/status", "services", "replicasets"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: grole-binding
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: default
+roleRef:
+  kind: Role
+  name: grole
+  apiGroup: rbac.authorization.k8s.io
+
+$ kubectl create -f ./role_and_binding.yaml
+```
 
 ```shell
 # Helm 3
@@ -79,7 +111,7 @@ See [*helm uninstall*](https://helm.sh/docs/helm/helm_uninstall/) for command do
 # Helm 3 or 2
 $ helm upgrade [RELEASE_NAME] [CHART] --install
 ```
-Sess [*helm upgrade*](https://helm.sh/docs/helm/helm_upgrade/) for command documentation.
+See [*helm upgrade*](https://helm.sh/docs/helm/helm_upgrade/) for command documentation.
 
 
 ## Configuration

@@ -40,13 +40,23 @@ class IFragmentWrapper : public GSObject {
   explicit IFragmentWrapper(std::string id)
       : GSObject(std::move(id), ObjectType::kFragmentWrapper) {}
 
-  virtual const rpc::GraphDef& graph_def() const = 0;
+  virtual const rpc::graph::GraphDefPb& graph_def() const = 0;
 
   virtual std::shared_ptr<void> fragment() const = 0;
 
   virtual bl::result<std::shared_ptr<IFragmentWrapper>> CopyGraph(
       const grape::CommSpec& comm_spec, const std::string& dst_graph_name,
       const std::string& copy_type) = 0;
+
+  virtual bl::result<std::shared_ptr<IFragmentWrapper>> ToDirected(
+      const grape::CommSpec& comm_spec, const std::string& dst_graph_name) = 0;
+
+  virtual bl::result<std::shared_ptr<IFragmentWrapper>> ToUnDirected(
+      const grape::CommSpec& comm_spec, const std::string& dst_graph_name) = 0;
+
+  virtual bl::result<std::shared_ptr<IFragmentWrapper>> CreateGraphView(
+      const grape::CommSpec& comm_spec, const std::string& dst_graph_name,
+      const std::string& view_type) = 0;
 
  protected:
   explicit IFragmentWrapper(std::string id, ObjectType type)

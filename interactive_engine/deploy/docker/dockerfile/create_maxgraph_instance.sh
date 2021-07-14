@@ -23,7 +23,6 @@ function _create_maxgraph_instance {
     echo $?
     # launch interactive engine per analytical pod
     parallel_run "$launch_engine_cmd" "$pod_hosts" $ENGINE_CONTAINER 1>/dev/null 2>&1
-    sleep 15s
     _expose_gremlin_server "8182"
 }
 function _create_pod {
@@ -116,6 +115,6 @@ export gremlin_server_mem=$7
 export engine_paras=$8
 export launch_engine_cmd="export object_id=${object_id} && /home/maxgraph/executor-entrypoint.sh"
 
-export requests_cpu=1.0
-export requests_mem="1Gi"
+export requests_cpu=0.5
+export requests_mem="512Mi"
 _create_maxgraph_instance

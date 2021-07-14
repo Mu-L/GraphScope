@@ -83,10 +83,14 @@ void LoadGraph(
 
           BOOST_LEAF_AUTO(new_frag_group_id, vineyard::ConstructFragmentGroup(
                                                  client, frag_id, comm_spec));
-          gs::rpc::GraphDef graph_def;
+          gs::rpc::graph::GraphDefPb graph_def;
 
           graph_def.set_key(graph_name);
-          graph_def.set_vineyard_id(new_frag_group_id);
+          gs::rpc::graph::VineyardInfoPb vy_info;
+          if (graph_def.has_extension()) {
+            graph_def.extension().UnpackTo(&vy_info);
+          }
+          vy_info.set_vineyard_id(new_frag_group_id);
           gs::set_graph_def(frag, graph_def);
 
           auto wrapper = std::make_shared<gs::FragmentWrapper<_GRAPH_TYPE>>(
@@ -97,11 +101,25 @@ void LoadGraph(
           gs::ArrowFragmentLoader<oid_t, vid_t> loader(client, comm_spec,
                                                        graph_info);
 
+          MPI_Barrier(comm_spec.comm());
+          {
+            vineyard::json __dummy;
+            VINEYARD_DISCARD(client.GetData(vineyard::InvalidObjectID(),
+                                            __dummy, true, false));
+          }
+
           BOOST_LEAF_AUTO(frag_group_id, loader.LoadFragmentAsFragmentGroup());
           MPI_Barrier(comm_spec.comm());
 
           LOG(INFO) << "[worker-" << comm_spec.worker_id()
                     << "] loaded graph to vineyard ...";
+
+          MPI_Barrier(comm_spec.comm());
+          {
+            vineyard::json __dummy;
+            VINEYARD_DISCARD(client.GetData(vineyard::InvalidObjectID(),
+                                            __dummy, true, false));
+          }
 
           auto fg = std::dynamic_pointer_cast<vineyard::ArrowFragmentGroup>(
               client.GetObject(frag_group_id));
@@ -109,11 +127,17 @@ void LoadGraph(
           auto frag_id = fg->Fragments().at(fid);
           auto frag =
               std::static_pointer_cast<_GRAPH_TYPE>(client.GetObject(frag_id));
-          gs::rpc::GraphDef graph_def;
+          gs::rpc::graph::GraphDefPb graph_def;
 
           graph_def.set_key(graph_name);
-          graph_def.set_vineyard_id(frag_group_id);
-          graph_def.set_generate_eid(graph_info->generate_eid);
+
+          gs::rpc::graph::VineyardInfoPb vy_info;
+          if (graph_def.has_extension()) {
+            graph_def.extension().UnpackTo(&vy_info);
+          }
+          vy_info.set_vineyard_id(frag_group_id);
+          vy_info.set_generate_eid(graph_info->generate_eid);
+          graph_def.mutable_extension()->PackFrom(vy_info);
           gs::set_graph_def(frag, graph_def);
 
           auto wrapper = std::make_shared<gs::FragmentWrapper<_GRAPH_TYPE>>(
@@ -128,7 +152,7 @@ void ToArrowFragment(
     std::shared_ptr<gs::IFragmentWrapper>& wrapper_in,
     const std::string& dst_graph_name,
     gs::bl::result<std::shared_ptr<gs::IFragmentWrapper>>& wrapper_out) {
-#ifdef EXPERIMENTAL_ON
+#ifdef NETWORKX
   using oid_t = typename _GRAPH_TYPE::oid_t;
   using vid_t = typename _GRAPH_TYPE::vid_t;
   static_assert(std::is_same<vid_t, gs::DynamicFragment::vid_t>::value,
@@ -138,8 +162,9 @@ void ToArrowFragment(
 
   wrapper_out = gs::bl::try_handle_some(
       [&]() -> gs::bl::result<std::shared_ptr<gs::IFragmentWrapper>> {
-#ifdef EXPERIMENTAL_ON
-        if (wrapper_in->graph_def().graph_type() != gs::rpc::DYNAMIC_PROPERTY) {
+#ifdef NETWORKX
+        if (wrapper_in->graph_def().graph_type() !=
+            gs::rpc::graph::DYNAMIC_PROPERTY) {
           RETURN_GS_ERROR(vineyard::ErrorCode::kInvalidValueError,
                           "Source fragment it not DynamicFragment.");
         }
@@ -171,10 +196,16 @@ void ToArrowFragment(
         BOOST_LEAF_AUTO(frag_group_id,
                         vineyard::ConstructFragmentGroup(
                             client, arrow_frag->id(), comm_spec));
-        gs::rpc::GraphDef graph_def;
+        gs::rpc::graph::GraphDefPb graph_def;
 
         graph_def.set_key(dst_graph_name);
-        graph_def.set_vineyard_id(frag_group_id);
+        gs::rpc::graph::VineyardInfoPb vy_info;
+        if (graph_def.has_extension()) {
+          graph_def.extension().UnpackTo(&vy_info);
+        }
+        vy_info.set_vineyard_id(frag_group_id);
+        graph_def.mutable_extension()->PackFrom(vy_info);
+
         gs::set_graph_def(arrow_frag, graph_def);
 
         auto wrapper = std::make_shared<gs::FragmentWrapper<_GRAPH_TYPE>>(
@@ -192,49 +223,51 @@ void ToDynamicFragment(
     std::shared_ptr<gs::IFragmentWrapper>& wrapper_in,
     const std::string& dst_graph_name,
     gs::bl::result<std::shared_ptr<gs::IFragmentWrapper>>& wrapper_out) {
-  wrapper_out = gs::bl::try_handle_some(
-      [&]() -> gs::bl::result<std::shared_ptr<gs::IFragmentWrapper>> {
-#ifdef EXPERIMENTAL_ON
-        if (wrapper_in->graph_def().graph_type() != gs::rpc::ARROW_PROPERTY) {
-          RETURN_GS_ERROR(vineyard::ErrorCode::kInvalidValueError,
-                          "Source fragment it not ArrowFragment.");
-        }
-        auto arrow_frag =
-            std::static_pointer_cast<_GRAPH_TYPE>(wrapper_in->fragment());
-        gs::ArrowToDynamicConverter<_GRAPH_TYPE> converter(comm_spec);
+  wrapper_out = gs::bl::try_handle_some([&]() -> gs::bl::result<std::shared_ptr<
+                                                  gs::IFragmentWrapper>> {
+#ifdef NETWORKX
+    if (wrapper_in->graph_def().graph_type() !=
+        gs::rpc::graph::ARROW_PROPERTY) {
+      RETURN_GS_ERROR(vineyard::ErrorCode::kInvalidValueError,
+                      "Source fragment it not ArrowFragment.");
+    }
+    auto arrow_frag =
+        std::static_pointer_cast<_GRAPH_TYPE>(wrapper_in->fragment());
+    gs::ArrowToDynamicConverter<_GRAPH_TYPE> converter(comm_spec);
 
-        BOOST_LEAF_AUTO(dynamic_frag, converter.Convert(arrow_frag));
+    BOOST_LEAF_AUTO(dynamic_frag, converter.Convert(arrow_frag));
 
-        gs::rpc::GraphDef graph_def;
+    gs::rpc::graph::GraphDefPb graph_def;
 
-        graph_def.set_key(dst_graph_name);
-        graph_def.set_directed(dynamic_frag->directed());
-        graph_def.set_graph_type(gs::rpc::DYNAMIC_PROPERTY);
+    graph_def.set_key(dst_graph_name);
+    graph_def.set_directed(dynamic_frag->directed());
+    graph_def.set_graph_type(gs::rpc::graph::DYNAMIC_PROPERTY);
+    gs::rpc::graph::VineyardInfoPb vy_info;
+    if (graph_def.has_extension()) {
+      graph_def.extension().UnpackTo(&vy_info);
+    }
+    vy_info.set_oid_type(gs::PropertyTypeToPb(vineyard::normalize_datatype(
+        vineyard::TypeName<typename gs::DynamicFragment::oid_t>::Get())));
+    vy_info.set_vid_type(gs::PropertyTypeToPb(vineyard::normalize_datatype(
+        vineyard::TypeName<typename gs::DynamicFragment::vid_t>::Get())));
+    vy_info.set_vdata_type(gs::PropertyTypeToPb(vineyard::normalize_datatype(
+        vineyard::TypeName<typename gs::DynamicFragment::vdata_t>::Get())));
+    vy_info.set_edata_type(gs::PropertyTypeToPb(vineyard::normalize_datatype(
+        vineyard::TypeName<typename gs::DynamicFragment::edata_t>::Get())));
+    vy_info.set_property_schema_json("{}");
+    graph_def.mutable_extension()->PackFrom(vy_info);
 
-        auto* schema_def = graph_def.mutable_schema_def();
-
-        schema_def->set_oid_type(
-            vineyard::TypeName<typename gs::DynamicFragment::oid_t>::Get());
-        schema_def->set_vid_type(
-            vineyard::TypeName<typename gs::DynamicFragment::vid_t>::Get());
-        schema_def->set_vdata_type(
-            vineyard::TypeName<typename gs::DynamicFragment::vdata_t>::Get());
-        schema_def->set_edata_type(
-            vineyard::TypeName<typename gs::DynamicFragment::edata_t>::Get());
-        schema_def->set_property_schema_json("{}");
-
-        auto wrapper =
-            std::make_shared<gs::FragmentWrapper<gs::DynamicFragment>>(
-                dst_graph_name, graph_def, dynamic_frag);
-        return std::dynamic_pointer_cast<gs::IFragmentWrapper>(wrapper);
+    auto wrapper = std::make_shared<gs::FragmentWrapper<gs::DynamicFragment>>(
+        dst_graph_name, graph_def, dynamic_frag);
+    return std::dynamic_pointer_cast<gs::IFragmentWrapper>(wrapper);
 #else
-        RETURN_GS_ERROR(vineyard::ErrorCode::kUnimplementedMethod,
-                        "GS is compiled without folly");
+    RETURN_GS_ERROR(vineyard::ErrorCode::kUnimplementedMethod,
+                    "GS is compiled without folly");
 #endif
-      });
+  });
 }
 
-void AddVerticesToGraph(
+void AddLabelsToGraph(
     vineyard::ObjectID frag_id, const grape::CommSpec& comm_spec,
     vineyard::Client& client, const std::string& graph_name,
     const gs::rpc::GSParams& params,
@@ -249,11 +282,11 @@ void AddVerticesToGraph(
                                                      graph_info);
 
         BOOST_LEAF_AUTO(frag_group_id,
-                        loader.AddVerticesAsFragmentGroup(frag_id));
+                        loader.AddLabelsToGraphAsFragmentGroup(frag_id));
         MPI_Barrier(comm_spec.comm());
 
         LOG(INFO) << "[worker-" << comm_spec.worker_id()
-                  << "] Add edges to graph and loaded to vineyard ...";
+                  << "] Add labels to graph and loaded to vineyard ...";
 
         auto fg = std::dynamic_pointer_cast<vineyard::ArrowFragmentGroup>(
             client.GetObject(frag_group_id));
@@ -261,11 +294,17 @@ void AddVerticesToGraph(
         auto frag_id = fg->Fragments().at(fid);
         auto frag =
             std::static_pointer_cast<_GRAPH_TYPE>(client.GetObject(frag_id));
-        gs::rpc::GraphDef graph_def;
+        gs::rpc::graph::GraphDefPb graph_def;
 
         graph_def.set_key(graph_name);
-        graph_def.set_vineyard_id(frag_group_id);
-        graph_def.set_generate_eid(graph_info->generate_eid);
+
+        gs::rpc::graph::VineyardInfoPb vy_info;
+        if (graph_def.has_extension()) {
+          graph_def.extension().UnpackTo(&vy_info);
+        }
+        vy_info.set_vineyard_id(frag_group_id);
+        vy_info.set_generate_eid(graph_info->generate_eid);
+        graph_def.mutable_extension()->PackFrom(vy_info);
         gs::set_graph_def(frag, graph_def);
 
         auto wrapper = std::make_shared<gs::FragmentWrapper<_GRAPH_TYPE>>(
@@ -273,46 +312,6 @@ void AddVerticesToGraph(
         return std::dynamic_pointer_cast<gs::IFragmentWrapper>(wrapper);
       });
 }
-
-void AddEdgesToGraph(
-    vineyard::ObjectID frag_id, const grape::CommSpec& comm_spec,
-    vineyard::Client& client, const std::string& graph_name,
-    const gs::rpc::GSParams& params,
-    gs::bl::result<std::shared_ptr<gs::IFragmentWrapper>>& fragment_wrapper) {
-  using oid_t = typename _GRAPH_TYPE::oid_t;
-  using vid_t = typename _GRAPH_TYPE::vid_t;
-
-  fragment_wrapper = gs::bl::try_handle_some(
-      [&]() -> gs::bl::result<std::shared_ptr<gs::IFragmentWrapper>> {
-        BOOST_LEAF_AUTO(graph_info, gs::ParseCreatePropertyGraph(params));
-        gs::ArrowFragmentLoader<oid_t, vid_t> loader(client, comm_spec,
-                                                     graph_info);
-
-        BOOST_LEAF_AUTO(frag_group_id, loader.AddEdgesAsFragmentGroup(frag_id));
-        MPI_Barrier(comm_spec.comm());
-
-        LOG(INFO) << "[worker-" << comm_spec.worker_id()
-                  << "] Add edges to graph and loaded to vineyard ...";
-
-        auto fg = std::dynamic_pointer_cast<vineyard::ArrowFragmentGroup>(
-            client.GetObject(frag_group_id));
-        auto fid = comm_spec.WorkerToFrag(comm_spec.worker_id());
-        auto frag_id = fg->Fragments().at(fid);
-        auto frag =
-            std::static_pointer_cast<_GRAPH_TYPE>(client.GetObject(frag_id));
-        gs::rpc::GraphDef graph_def;
-
-        graph_def.set_key(graph_name);
-        graph_def.set_vineyard_id(frag_group_id);
-        graph_def.set_generate_eid(graph_info->generate_eid);
-        gs::set_graph_def(frag, graph_def);
-
-        auto wrapper = std::make_shared<gs::FragmentWrapper<_GRAPH_TYPE>>(
-            graph_name, graph_def, frag);
-        return std::dynamic_pointer_cast<gs::IFragmentWrapper>(wrapper);
-      });
-}
-
 template class vineyard::BasicArrowVertexMapBuilder<
     typename vineyard::InternalType<_GRAPH_TYPE::oid_t>::type,
     _GRAPH_TYPE::vid_t>;

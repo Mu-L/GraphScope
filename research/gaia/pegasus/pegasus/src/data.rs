@@ -1,12 +1,12 @@
 //
 //! Copyright 2020 Alibaba Group Holding Limited.
-//! 
+//!
 //! Licensed under the Apache License, Version 2.0 (the "License");
 //! you may not use this file except in compliance with the License.
 //! You may obtain a copy of the License at
-//! 
+//!
 //! http://www.apache.org/licenses/LICENSE-2.0
-//! 
+//!
 //! Unless required by applicable law or agreed to in writing, software
 //! distributed under the License is distributed on an "AS IS" BASIS,
 //! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,7 @@ pub struct DataSet<T> {
 impl<D> DataSet<D> {
     #[inline]
     pub fn empty() -> Self {
-        DataSet { tag: crate::tag::ROOT.clone(), data: Vec::new(), recycle_hook: None }
+        DataSet { tag: Tag::Root, data: Vec::new(), recycle_hook: None }
     }
 
     pub fn new<T: Into<Tag>>(tag: T, data: Vec<D>) -> Self {

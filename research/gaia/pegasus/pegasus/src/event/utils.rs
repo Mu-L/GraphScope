@@ -1,12 +1,12 @@
 //
 //! Copyright 2020 Alibaba Group Holding Limited.
-//! 
+//!
 //! Licensed under the Apache License, Version 2.0 (the "License");
 //! you may not use this file except in compliance with the License.
 //! You may obtain a copy of the License at
-//! 
+//!
 //! http://www.apache.org/licenses/LICENSE-2.0
-//! 
+//!
 //! Unless required by applicable law or agreed to in writing, software
 //! distributed under the License is distributed on an "AS IS" BASIS,
 //! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,9 +14,10 @@
 //! limitations under the License.
 
 use crate::Tag;
+use ahash::AHashMap;
 use pegasus_common::rc::RcPointer;
 use std::cell::{RefCell, RefMut};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 #[derive(Clone)]
 enum Fence {
@@ -65,7 +66,7 @@ impl Fence {
         match self {
             Fence::Little(f) => {
                 let guard = (1u128 << guard) - 1;
-                // println!("guard is {}, fence is {}", guard, f);
+                debug_worker!("guard is {}, fence is {}", guard, f);
                 *f >= guard
             }
             Fence::Large(f) => f.len() >= guard,
@@ -131,12 +132,20 @@ impl<T> CountDownLatchNode<T> {
         self.children.borrow_mut().push(child.clone());
         child
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.content.borrow().is_none()
+    }
+
+    pub fn set_content(&self, content: T) {
+        self.content.replace(Some(content));
+    }
 }
 
 pub struct CountDownLatchTree {
     pub guard: usize,
     root: CountDownLatchNode<Tag>,
-    leaf: RefCell<HashMap<Tag, RcPointer<CountDownLatchNode<Tag>>>>,
+    leaf: RefCell<AHashMap<Tag, RcPointer<CountDownLatchNode<Tag>>>>,
     count_downed: RefCell<Vec<Tag>>,
 }
 
@@ -144,8 +153,8 @@ impl CountDownLatchTree {
     pub fn new(guard: usize) -> Self {
         CountDownLatchTree {
             guard,
-            root: CountDownLatchNode::new(guard, crate::tag::ROOT.clone()),
-            leaf: RefCell::new(HashMap::new()),
+            root: CountDownLatchNode::new(guard, Tag::Root),
+            leaf: RefCell::new(AHashMap::new()),
             count_downed: RefCell::new(vec![]),
         }
     }
@@ -156,6 +165,9 @@ impl CountDownLatchTree {
         } else {
             let leaf = self.leaf.borrow();
             if let Some(node) = leaf.get(&tag) {
+                if node.is_empty() {
+                    node.set_content(tag);
+                }
                 for e in node.count_down(sig).drain(..) {
                     self.count_downed.borrow_mut().push(e);
                 }
@@ -257,5 +269,18 @@ mod test {
         assert_eq!("root_child", r[0].as_str());
         assert!(!child_tdl.is_blocked());
         assert!(root_cdl.is_blocked())
+    }
+
+    #[test]
+    fn count_down_tree_test() {
+        let cdl_tree = CountDownLatchTree::new(2);
+        assert!(cdl_tree.count_down(tag![0, 0], 0).is_empty());
+        assert!(cdl_tree.count_down(tag![0, 0], 0).is_empty());
+        let tag = cdl_tree.count_down(tag![0, 0], 1).remove(0);
+        assert_eq!(tag, tag![0, 0]);
+        assert!(cdl_tree.count_down(tag![0], 0).is_empty());
+        assert!(cdl_tree.count_down(tag![0], 0).is_empty());
+        let tag = cdl_tree.count_down(tag![0], 1).remove(0);
+        assert_eq!(tag, tag![0]);
     }
 }

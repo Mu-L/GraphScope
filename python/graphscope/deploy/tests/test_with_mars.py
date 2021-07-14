@@ -69,8 +69,13 @@ def gs_session():
         k8s_engine_cpu=2,
         k8s_engine_mem="4Gi",
         k8s_etcd_cpu=2,
+        k8s_etcd_num_pods=3,
+        k8s_zookeeper_cpu=0.5,
+        k8s_zookeeper_mem="256Mi",
+        k8s_gie_graph_manager_cpu=1,
+        k8s_gie_graph_manager_mem="4Gi",
         k8s_etcd_mem="256Mi",
-        k8s_vineyard_shared_mem="4Gi",
+        vineyard_shared_mem="4Gi",
         k8s_volumes=get_k8s_volumes(),
         with_mars=True,  # enable mars
     )
@@ -78,6 +83,7 @@ def gs_session():
     sess.close()
 
 
+@pytest.mark.skip(reason="TODO: the mars integration with vineyard will be revisited.")
 def test_mars_session(gs_session):
     from mars import dataframe as md
     from mars import tensor as mt

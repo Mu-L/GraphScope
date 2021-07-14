@@ -27,6 +27,7 @@ import sys
 from graphscope.config import GSConfig as gs_config
 from graphscope.deploy.hosts.utils import is_port_in_use
 from graphscope.deploy.launcher import Launcher
+from graphscope.framework.utils import random_string
 
 try:
     import gscoordinator
@@ -43,20 +44,7 @@ logger = logging.getLogger("graphscope")
 
 
 class HostsClusterLauncher(Launcher):
-    """Class for setting up GraphScope instance on hosts cluster
-
-    Args:
-        hosts (list):
-            List of hostname of workers.
-        port (int, optional):
-            Used to launch coordinator, or random valid port when Param missing.
-        num_workers (int):
-            Number of workers to launch graphscope engine.
-        vineyard_socket (str, optional):
-            Socket path to connect to vineyard or a random socket will be created if param missing
-        timeout_seconds (int, optional):
-            Wait util reached timeout.
-    """
+    """Class for setting up GraphScope instance on hosts cluster"""
 
     def __init__(
         self,
@@ -65,13 +53,17 @@ class HostsClusterLauncher(Launcher):
         num_workers=None,
         vineyard_socket=None,
         timeout_seconds=None,
+        vineyard_shared_mem=None,
+        **kwargs
     ):
         self._hosts = hosts
         self._port = port
         self._num_workers = num_workers
         self._vineyard_socket = vineyard_socket
         self._timeout_seconds = timeout_seconds
+        self._vineyard_shared_mem = vineyard_shared_mem
 
+        self._instance_id = random_string(6)
         self._proc = None
         self._closed = True
 
@@ -104,9 +96,12 @@ class HostsClusterLauncher(Launcher):
             "{}".format(str(self._port)),
             "--cluster_type",
             self.type(),
+            "--instance_id",
+            self._instance_id,
         ]
 
-        print(" ".join(cmd))
+        if self._vineyard_shared_mem is not None:
+            cmd.extend(["--vineyard_shared_mem", self._vineyard_shared_mem])
 
         if self._vineyard_socket is not None:
             cmd.extend(["--vineyard_socket", "{}".format(self._vineyard_socket)])

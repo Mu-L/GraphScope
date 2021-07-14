@@ -192,13 +192,10 @@ class Loader(object):
         # If protocol is not set, use 'file' as default
         if not self.protocol:
             self.protocol = "file"
-        check_argument(
-            self.protocol in ("file", "hdfs", "hive", "oss", "s3", "vineyard")
-        )
-        if self.protocol == "file":
-            self.source = source
-        else:
+        if self.protocol in ("hdfs", "hive", "oss", "s3", "vineyard"):
             self.process_vineyard(source)
+        else:
+            self.source = source
 
     def process_numpy(self, source: Sequence[np.ndarray]):
         self.protocol = "numpy"
@@ -278,17 +275,24 @@ class Loader(object):
         self.source = source
         self.preprocessor = func
 
-    def finish(self):
-        from graphscope.client.session import get_default_session
-
+    def finish(self, session_id=None):
         if self.finished:
             return
         if self.preprocessor is not None:
+            if session_id is None:
+                from graphscope.client.session import get_default_session
+
+                sess = get_default_session()
+            else:
+                from graphscope.client.session import get_session_by_id
+
+                sess = get_session_by_id(session_id)
+
             self.protocol, self.source = self.preprocessor(
                 self.source,
                 self.storage_options,
                 self.options.to_dict(),
-                get_default_session(),
+                sess,
             )
             logger.debug(
                 f"processed protocol = {self.protocol}, source = {self.source}"

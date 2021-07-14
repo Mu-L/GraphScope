@@ -1,12 +1,12 @@
 //
 //! Copyright 2020 Alibaba Group Holding Limited.
-//! 
+//!
 //! Licensed under the Apache License, Version 2.0 (the "License");
 //! you may not use this file except in compliance with the License.
 //! You may obtain a copy of the License at
-//! 
+//!
 //! http://www.apache.org/licenses/LICENSE-2.0
-//! 
+//!
 //! Unless required by applicable law or agreed to in writing, software
 //! distributed under the License is distributed on an "AS IS" BASIS,
 //! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -62,8 +62,8 @@ impl<D: Data> OperatorCore for Feedback<D> {
             output.forward(data_set)?;
             Ok(())
         })?;
-        let (p, current) = tag.split().expect("unwrap tag split result failure;");
-        let current = current + 1;
+        let p = tag.to_parent_uncheck();
+        let current = tag.current_uncheck() + 1;
         let pre = self.in_loop.entry(p).or_insert(0);
         if *pre < current {
             *pre = current
@@ -78,7 +78,8 @@ impl<D: Data> OperatorCore for Feedback<D> {
             outputs[1].ignore(&n.tag);
             // get new end notification of data stream;
             // as it is in a loop context, the end notification indicates a end of an iteration;
-            let (p, round) = n.tag.split().expect("unwrap tag split result failure;");
+            let p = n.tag.to_parent_uncheck();
+            let round = n.tag.current_uncheck();
             if round < self.max_iters {
                 // it means that the data of scope `p` had finished the nth iteration;
                 if let Some(cur) = self.in_loop.get(&p) {

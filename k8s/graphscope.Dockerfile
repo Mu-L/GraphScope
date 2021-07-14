@@ -4,20 +4,21 @@
 # the result image includes all runtime stuffs of graphscope, with analytical engine,
 # learning engine and interactive engine installed.
 
-ARG BASE_VERSION=v0.1.14
+ARG BASE_VERSION=v0.2.5
 FROM registry.cn-hongkong.aliyuncs.com/graphscope/graphscope-vineyard:$BASE_VERSION as builder
 
 ARG CI=true
 ENV CI=$CI
 
-ARG EXPERIMENTAL_ON=ON
-ENV EXPERIMENTAL_ON=$EXPERIMENTAL_ON
+ARG NETWORKX=ON
+ENV NETWORKX=$NETWORKX
 
 ARG profile=release
 ENV profile=$profile
 
 COPY ./k8s/kube_ssh /opt/graphscope/bin/kube_ssh
 COPY ./k8s/pre_stop.py /opt/graphscope/bin/pre_stop.py
+COPY ./k8s/ready_probe.sh /tmp/ready_probe.sh
 COPY . /root/gs
 
 # build & install graph-learn library
@@ -39,7 +40,7 @@ RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/graphscope/lib:/opt/graphscope/
     cd build && \
     cmake .. -DCMAKE_PREFIX_PATH=/opt/graphscope \
              -DCMAKE_INSTALL_PREFIX=/opt/graphscope \
-             -DEXPERIMENTAL_ON=$EXPERIMENTAL_ON && \
+             -DNETWORKX=$NETWORKX && \
     make gsa_cpplint && \
     make -j`nproc` && \
     make install && \
@@ -95,7 +96,7 @@ RUN source ~/.bashrc \
 
 # # # # # # # # # # # # # # # # # # # # # #
 # generate final runtime image
-FROM registry.cn-hongkong.aliyuncs.com/graphscope/graphscope-runtime:latest
+FROM registry.cn-hongkong.aliyuncs.com/graphscope/graphscope-runtime:debug
 
 ARG profile=release
 

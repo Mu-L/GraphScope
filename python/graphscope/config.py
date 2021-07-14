@@ -26,6 +26,9 @@ class GSConfig(object):
     # the endpoint of a pre-launched GraphScope instance.
     addr = None
 
+    # "lazy" or "eager", defaults to "eager"
+    mode = "eager"
+
     # "k8s" or "hosts"
     cluster_type = "k8s"
 
@@ -46,41 +49,41 @@ class GSConfig(object):
     k8s_image_pull_secrets = []
 
     # coordinator resource configuration
-    k8s_coordinator_cpu = 1.0
-    k8s_coordinator_mem = "4Gi"
+    k8s_coordinator_cpu = 0.5
+    k8s_coordinator_mem = "512Mi"
 
     # etcd resource configuration
-    k8s_etcd_num_pods = 3
-    k8s_etcd_cpu = 0.5
-    k8s_etcd_mem = "128Mi"
+    k8s_etcd_num_pods = 1
+    k8s_etcd_cpu = 1.0
+    k8s_etcd_mem = "512Mi"
 
     # zookeeper resource configuration
-    k8s_zookeeper_cpu = 0.5
-    k8s_zookeeper_mem = "256Mi"
+    k8s_zookeeper_cpu = 0.2
+    k8s_zookeeper_mem = "512Mi"
 
     # GIE graph manager resource configuration
-    k8s_gie_graph_manager_cpu = 1.0
-    k8s_gie_graph_manager_mem = "4Gi"
+    k8s_gie_graph_manager_cpu = 0.2
+    k8s_gie_graph_manager_mem = "512Mi"
 
     # GIE gremlin server resource configuration
-    k8s_gie_gremlin_server_cpu = 1.0
-    k8s_gie_gremlin_server_mem = "1Gi"
+    k8s_gie_gremlin_server_cpu = 0.5
+    k8s_gie_gremlin_server_mem = "512Mi"
 
     # vineyard resource configuration
-    k8s_vineyard_daemonset = ""
-    k8s_vineyard_cpu = 0.5
+    k8s_vineyard_daemonset = "none"
+    k8s_vineyard_cpu = 0.2
     k8s_vineyard_mem = "512Mi"
-    k8s_vineyard_shared_mem = "4Gi"
+    vineyard_shared_mem = "4Gi"
 
     # engine resource configuration
-    k8s_engine_cpu = 0.5
-    k8s_engine_mem = "4Gi"
+    k8s_engine_cpu = 0.2
+    k8s_engine_mem = "1Gi"
 
     # mars resource configuration
-    mars_worker_cpu = 0.5
-    mars_worker_mem = "4Gi"
-    mars_scheduler_cpu = 0.5
-    mars_scheduler_mem = "2Gi"
+    mars_worker_cpu = 0.2
+    mars_worker_mem = "512Mi"
+    mars_scheduler_cpu = 0.2
+    mars_scheduler_mem = "512Mi"
 
     # launch graphscope with mars
     with_mars = False
@@ -103,7 +106,7 @@ class GSConfig(object):
     # GIE instance will be created automatically when a property graph loaded.
     # Otherwise, you should create a GIE instance manually by `sess.gremlin` if
     # `initializing_interactive_engine` is False
-    initializing_interactive_engine = True
+    initializing_interactive_engine = False
 
     timeout_seconds = 600
 

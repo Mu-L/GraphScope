@@ -23,7 +23,7 @@ use pegasus::api::function::EncodeFunction;
 use pegasus::api::{Count, Fold, Group, KeyBy, ResultSet, Sink, RANGES};
 use pegasus::codec::ShadeCodec;
 use pegasus::stream::Stream;
-use pegasus::{BuildJobError, Data, JobConf, JobGuard, NeverClone};
+use pegasus::{BuildJobError, Data, JobConf, JobGuard, NeverClone, ServerConf};
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::sync::Arc;
@@ -117,8 +117,10 @@ impl<D: AnyData> Service<D> {
                             Ok(ec) => {
                                 let mut vec = Vec::new();
                                 vec.extend(src);
-                                let result = ec.encode(vec);
-                                output.on_next(result);
+                                if !vec.is_empty() {
+                                    let result = ec.encode(vec);
+                                    output.on_next(result);
+                                }
                             }
                             Err(err) => output.on_error(&err),
                         },
@@ -281,10 +283,22 @@ fn sink_shade<D: Send + Debug + 'static, O: Output + Clone>(
 
 #[inline]
 fn parse_job_conf(conf: pb::JobConfig) -> JobConf {
-    let mut job_conf = JobConf::new(conf.job_id, conf.job_name, conf.workers);
-    if !conf.servers.is_empty() {
-        job_conf.add_servers(&conf.servers);
+    let mut job_conf = JobConf::with_id(conf.job_id, conf.job_name, conf.workers);
+    if conf.time_limit != 0 {
+        job_conf.time_limit = conf.time_limit;
     }
-    // TODO: more job configurations;
+    if conf.batch_size != 0 {
+        job_conf.batch_size = conf.batch_size;
+    }
+    if conf.output_capacity != 0 {
+        job_conf.output_capacity = conf.output_capacity;
+    }
+    if conf.memory_limit != 0 {
+        job_conf.memory_limit = conf.memory_limit;
+    }
+    job_conf.plan_print = conf.plan_print;
+    if !conf.servers.is_empty() {
+        job_conf.reset_servers(ServerConf::Partial(conf.servers.clone()));
+    }
     job_conf
 }

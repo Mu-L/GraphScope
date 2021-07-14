@@ -27,6 +27,7 @@ import graphscope
 from graphscope.framework.errors import AnalyticalEngineInternalError
 from graphscope.framework.graph import Graph
 from graphscope.framework.loader import Loader
+from graphscope.proto import graph_def_pb2
 
 
 @pytest.fixture
@@ -245,14 +246,18 @@ def test_loader_with_specified_data_type(
         student_group_e, "group", ["group_id", ("member_size", "int")]
     )
     assert [p.type for p in graph.schema.get_vertex_properties("student")] == [
-        21,
-        11,
-        18,
-        21,
+        graph_def_pb2.STRING,
+        graph_def_pb2.INT,
+        graph_def_pb2.FLOAT,
+        graph_def_pb2.STRING,
     ]
-    assert [p.type for p in graph.schema.get_edge_properties("group")] == [21, 11]
+    assert [p.type for p in graph.schema.get_edge_properties("group")] == [
+        graph_def_pb2.STRING,
+        graph_def_pb2.INT,
+    ]
 
 
+@pytest.mark.skip(reason="waiting for vineyard support")
 def test_multi_src_dst_edge_loader(
     graphscope_session, student_group_e, teacher_group_e, student_v, teacher_v
 ):
@@ -317,6 +322,7 @@ def test_v_property_omitted_form_loader(graphscope_session, student_group_e, stu
     assert graph.loaded()
 
 
+@pytest.mark.skip(reason="vertex must be exist before add edges in eager mode.")
 def test_vertices_omitted_form_loader(graphscope_session, student_group_e):
     # vertices can be omit.
     graph = graphscope_session.g()
@@ -324,12 +330,14 @@ def test_vertices_omitted_form_loader(graphscope_session, student_group_e):
     assert graph.loaded()
 
 
+@pytest.mark.skip(reason="vertex must be exist before add edges in eager mode.")
 def test_all_omitted_form_loader(graphscope_session, student_group_e):
     graph = graphscope_session.g()
     graph = graph.add_edges(student_group_e, "group")
     assert graph.loaded()
 
 
+@pytest.mark.skip(reason="vertex must be exist before add edges in eager mode.")
 def test_multiple_e_all_omitted_form_loader(
     graphscope_session, student_group_e, friend_e
 ):
@@ -358,9 +366,7 @@ def test_errors_on_files(
     graphscope_session, one_column_file, double_type_id_file, empty_file
 ):
     with pytest.raises(AnalyticalEngineInternalError, match="Object not exists"):
-        Graph(
-            graphscope_session, vineyard.ObjectName("non_exist_vy_name")
-        )._ensure_loaded()
+        graphscope_session.g(vineyard.ObjectName("non_exist_vy_name"))
     return
     graph = graphscope_session.g()
     with pytest.raises(AnalyticalEngineInternalError, match="IOError"):
@@ -409,7 +415,7 @@ def test_error_on_ambigious_default_label(
     graph = graph.add_vertices(student_v, "student")
     graph = graph.add_vertices(teacher_v, "teacher")
 
-    with pytest.raises(AssertionError, match="ambiguous vertex label"):
+    with pytest.raises(AssertionError, match="Ambiguous vertex label"):
         graph = graph.add_edges(student_group_e, "group")
 
 

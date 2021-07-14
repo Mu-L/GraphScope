@@ -26,9 +26,10 @@ and the vineyard store that offers efficient in-memory data transfers.
    deployment
    loading_graph
    graph_transformation
-   interactive_engine
    analytics_engine
+   interactive_engine
    learning_engine
+   frequently_asked_questions
    developer_guide
 
 .. toctree::

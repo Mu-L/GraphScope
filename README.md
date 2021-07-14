@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="https://graphscope.io/assets/images/logo.png" width="400" alt="graphscope-logo">
+    <img src="https://graphscope.io/assets/images/graphscope-logo.svg" width="400" alt="graphscope-logo">
 </h1>
 <p align="center">
     A One-Stop Large-Scale Graph Computing System from Alibaba
@@ -7,10 +7,13 @@
 
 [![GraphScope CI](https://github.com/alibaba/GraphScope/workflows/GraphScope%20CI/badge.svg)](https://github.com/alibaba/GraphScope/actions?workflow=GraphScope+CI)
 [![Coverage](https://codecov.io/gh/alibaba/GraphScope/branch/main/graph/badge.svg)](https://codecov.io/gh/alibaba/GraphScope)
-[![Docs-en](https://shields.io/badge/Docs-English-blue?logo=Read%20The%20Docs)](https://graphscope.io/docs)
-[![Docs-zh](https://shields.io/badge/Docs-%E4%B8%AD%E6%96%87-blue?logo=Read%20The%20Docs)](https://graphscope.io/docs/zh/)
-[![README-zh](https://shields.io/badge/README-%E4%B8%AD%E6%96%87-blue)](README-zh.md)
 [![Playground](https://shields.io/badge/JupyterLab-Try%20GraphScope%20Now!-F37626?logo=jupyter)](https://try.graphscope.app)
+[![Artifact HUB](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/graphscope)](https://artifacthub.io/packages/helm/graphscope/graphscope)
+[![Docs-en](https://shields.io/badge/Docs-English-blue?logo=Read%20The%20Docs)](https://graphscope.io/docs)
+[![FAQ-en](https://img.shields.io/badge/-FAQ-blue?logo=Read%20The%20Docs)](https://graphscope.io/docs/frequently_asked_questions.html)
+[![Docs-zh](https://shields.io/badge/Docs-%E4%B8%AD%E6%96%87-blue?logo=Read%20The%20Docs)](https://graphscope.io/docs/zh/)
+[![FAQ-zh](https://img.shields.io/badge/-FAQ%E4%B8%AD%E6%96%87-blue?logo=Read%20The%20Docs)](https://graphscope.io/docs/zh/frequently_asked_questions.html)
+[![README-zh](https://shields.io/badge/README-%E4%B8%AD%E6%96%87-blue)](README-zh.md)
 
 GraphScope is a unified distributed graph computing platform that provides a one-stop environment for performing diverse graph operations on a cluster of computers through a user-friendly Python interface. GraphScope makes multi-staged processing of large-scale graph data on compute clusters simple by combining several important pieces of Alibaba technology: including [GRAPE](https://github.com/alibaba/libgrape-lite), [MaxGraph](interactive_engine/), and [Graph-Learn](https://github.com/alibaba/graph-learn) (GL) for analytics, interactive, and graph neural networks (GNN) computation, respectively, and the [vineyard](https://github.com/alibaba/libvineyard) store that offers efficient in-memory data transfers.
 
@@ -46,6 +49,12 @@ GraphScope client is distributed as a python package and can be easily installed
 
 ```bash
 pip3 install graphscope
+```
+
+Note that graphscope requires `pip>=19.0`, if you meet error like _"ERROR: Could not find a version that satisfies the requirement graphscope"_ please upgrade your pip with
+
+```bash
+pip3 install -U pip
 ```
 
 Next, we will walk you through a concrete example to illustrate how GraphScope can be used by data scientists to effectively analyze large graphs.
@@ -124,27 +133,25 @@ To load this graph to GraphScope, one may use the code below with the [data file
 
 ```python
 g = sess.g()
-g = (
-    g.add_vertices("/testingdata/ogbn_mag_small/paper.csv", label="paper")
-    .add_vertices("/testingdata/ogbn_mag_small/author.csv", label="author")
-    .add_vertices("/testingdata/ogbn_mag_small/institution.csv", label="institution")
-    .add_vertices("/testingdata/ogbn_mag_small/field_of_study.csv", label="field_of_study")
-    .add_edges(
-        "/testingdata/ogbn_mag_small/author_affiliated_with_institution.csv",
-        label="affiliated", src_label="author", dst_label="institution",
-    )
-    .add_edges(
-        "/testingdata/ogbn_mag_small/paper_has_topic_field_of_study.csv",
-        label="hasTopic", src_label="paper", dst_label="field_of_study",
-    )
-    .add_edges(
-        "/testingdata/ogbn_mag_small/paper_cites_paper.csv",
-        label="cites", src_label="paper", dst_label="paper",
-    )
-    .add_edges(
-        "/testingdata/ogbn_mag_small/author_writes_paper.csv",
-        label="writes", src_label="author", dst_label="paper",
-    )
+g = g.add_vertices("/testingdata/ogbn_mag_small/paper.csv", label="paper")
+g = g.add_vertices("/testingdata/ogbn_mag_small/author.csv", label="author")
+g = g.add_vertices("/testingdata/ogbn_mag_small/institution.csv", label="institution")
+g = g.add_vertices("/testingdata/ogbn_mag_small/field_of_study.csv", label="field_of_study")
+g = g.add_edges(
+    "/testingdata/ogbn_mag_small/author_affiliated_with_institution.csv",
+    label="affiliated", src_label="author", dst_label="institution",
+)
+g = g.add_edges(
+    "/testingdata/ogbn_mag_small/paper_has_topic_field_of_study.csv",
+    label="hasTopic", src_label="paper", dst_label="field_of_study",
+)
+g = g.add_edges(
+    "/testingdata/ogbn_mag_small/paper_cites_paper.csv",
+    label="cites", src_label="paper", dst_label="paper",
+)
+g = g.add_edges(
+    "/testingdata/ogbn_mag_small/author_writes_paper.csv",
+    label="writes", src_label="author", dst_label="paper",
 )
 ```
 

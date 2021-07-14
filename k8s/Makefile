@@ -21,7 +21,7 @@ endif
 VERSION ?= latest
 PROFILE ?= release
 
-DOCKER_BUILD_PROGRESS  	= auto
+BUILD_PROGRESS  	= auto
 
 submodule:
 	cd ../ && git submodule update --init
@@ -48,11 +48,26 @@ manager:
 				 -t graphscope/maxgraph_standalone_manager:${SHORT_SHA} \
 				 -f ../k8s/manager.Dockerfile .
 
+graphscope-store:
+	docker build --progress=$(BUILD_PROGRESS) \
+                                 --build-arg profile=${PROFILE} \
+                                 -t ${REGISTRY}/$(DOCKER_ORG)/graphscope-store:${VERSION} \
+                                 --network=host \
+                                 -f $(WORKING_DIR)/graphscope-store.Dockerfile ..
+
 graphscope-manylinux2010:
 	docker build --progress=$(BUILD_PROGRESS) \
 				 -t ${REGISTRY}/$(DOCKER_ORG)/graphscope-manylinux2010:${VERSION} \
 				 --network=host \
 				 -f $(WORKING_DIR)/manylinux2010.Dockerfile .
+
+graphscope-jupyter-manylinux2010-py2-py3:
+	docker run --rm -it -v $(WORKING_DIR)/..:/work \
+		   ${REGISTRY}/$(DOCKER_ORG)/graphscope-manylinux2010:${VERSION} \
+		   /usr/bin/scl enable devtoolset-8 'sh -c "export PATH=$$PATH:/opt/python/cp36-cp36m/bin && \
+					pip3 install graphscope -U && \
+					cd /work/python/jupyter/graphscope && \
+					python3 setup.py bdist_wheel"'
 
 graphscope-manylinux2010-py36:
 	docker run --rm -it -v $(WORKING_DIR)/..:/work \

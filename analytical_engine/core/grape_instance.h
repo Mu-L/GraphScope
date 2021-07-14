@@ -21,6 +21,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -33,6 +34,7 @@
 #include "grape/worker/comm_spec.h"
 
 #include "core/context/i_context.h"
+#include "core/fragment/dynamic_fragment.h"
 #include "core/object/object_manager.h"
 #include "core/server/dispatcher.h"
 #include "core/server/graphscope_service.h"
@@ -43,17 +45,17 @@
 namespace gs {
 /**
  * @brief EngineConfig contains configurations about the analytical engine, such
- * as experimental features in enabled or not, vineyard socket, and vineyard rpc
+ * as networkx features in enabled or not, vineyard socket, and vineyard rpc
  * endpoint.
  */
 struct EngineConfig {
-  std::string experimental;
+  std::string networkx;
   std::string vineyard_socket;
   std::string vineyard_rpc_endpoint;
 
   std::string ToJsonString() const {
     boost::property_tree::ptree pt;
-    pt.put("experimental", experimental);
+    pt.put("networkx", networkx);
     pt.put("vineyard_socket", vineyard_socket);
     pt.put("vineyard_rpc_endpoint", vineyard_rpc_endpoint);
     std::stringstream ss;
@@ -78,7 +80,7 @@ class GrapeInstance : public Subscriber {
       const CommandDetail& cmd) override;
 
  private:
-  bl::result<rpc::GraphDef> loadGraph(const rpc::GSParams& params);
+  bl::result<rpc::graph::GraphDefPb> loadGraph(const rpc::GSParams& params);
 
   bl::result<void> unloadGraph(const rpc::GSParams& params);
 
@@ -91,15 +93,20 @@ class GrapeInstance : public Subscriber {
 
   bl::result<std::string> reportGraph(const rpc::GSParams& params);
 
-  bl::result<rpc::GraphDef> projectGraph(const rpc::GSParams& params);
+  bl::result<rpc::graph::GraphDefPb> projectGraph(const rpc::GSParams& params);
 
-  bl::result<rpc::GraphDef> projectToSimple(const rpc::GSParams& params);
+  bl::result<rpc::graph::GraphDefPb> projectToSimple(
+      const rpc::GSParams& params);
 
   bl::result<void> modifyVertices(const rpc::GSParams& params,
                                   const std::vector<std::string>& vertices);
 
   bl::result<void> modifyEdges(const rpc::GSParams& params,
                                const std::vector<std::string>& edges);
+
+  bl::result<void> clearEdges(const rpc::GSParams& params);
+
+  bl::result<void> clearGraph(const rpc::GSParams& params);
 
   bl::result<std::shared_ptr<grape::InArchive>> contextToNumpy(
       const rpc::GSParams& params);
@@ -112,15 +119,32 @@ class GrapeInstance : public Subscriber {
   bl::result<std::string> contextToVineyardDataFrame(
       const rpc::GSParams& params);
 
-  bl::result<rpc::GraphDef> addColumn(const rpc::GSParams& params);
+  bl::result<rpc::graph::GraphDefPb> addColumn(const rpc::GSParams& params);
 
-  bl::result<rpc::GraphDef> convertGraph(const rpc::GSParams& params);
+  bl::result<rpc::graph::GraphDefPb> convertGraph(const rpc::GSParams& params);
 
-  bl::result<rpc::GraphDef> copyGraph(const rpc::GSParams& params);
+  bl::result<rpc::graph::GraphDefPb> copyGraph(const rpc::GSParams& params);
 
-  bl::result<rpc::GraphDef> addVertices(const rpc::GSParams& params);
+  bl::result<rpc::graph::GraphDefPb> toDirected(const rpc::GSParams& params);
 
-  bl::result<rpc::GraphDef> addEdges(const rpc::GSParams& params);
+  bl::result<rpc::graph::GraphDefPb> toUnDirected(const rpc::GSParams& params);
+
+  bl::result<rpc::graph::GraphDefPb> createGraphView(
+      const rpc::GSParams& params);
+
+#ifdef NETWORKX
+  bl::result<rpc::graph::GraphDefPb> induceSubGraph(
+      const rpc::GSParams& params,
+      const std::unordered_set<typename DynamicFragment::oid_t>&
+          induced_vertices,
+      const std::vector<std::pair<typename DynamicFragment::oid_t,
+                                  typename DynamicFragment::oid_t>>&
+          induced_edges);
+#endif  // NETWORKX
+
+  bl::result<rpc::graph::GraphDefPb> addLabelsToGraph(
+      const rpc::GSParams& params);
+  bl::result<std::string> getContextData(const rpc::GSParams& params);
 
   bl::result<std::shared_ptr<grape::InArchive>> graphToNumpy(
       const rpc::GSParams& params);

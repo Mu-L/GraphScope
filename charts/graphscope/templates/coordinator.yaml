@@ -63,6 +63,8 @@ spec:
         - {{ .Release.Namespace }}
         - "--k8s_service_type"
         - {{ .Values.coordinator.service.type }}
+        - "--preemptive"
+        - {{ .Values.preemptive | quote }}
         - "--k8s_gs_image"
         {{- if .Values.engines.gae.image.tag }}
         - "{{ .Values.engines.gae.image.name }}:{{ .Values.engines.gae.image.tag }}"
@@ -118,7 +120,7 @@ spec:
         - {{ .Values.vineyard.resources.requests.cpu | quote }}
         - "--k8s_vineyard_mem"
         - {{ .Values.vineyard.resources.requests.memory }}
-        - "--k8s_vineyard_shared_mem"
+        - "--vineyard_shared_mem"
         - {{ .Values.vineyard.shared_mem }}
         - "--k8s_engine_cpu"
         - {{ .Values.engines.gae.resources.requests.cpu | quote }}

@@ -1,12 +1,12 @@
 //
 //! Copyright 2020 Alibaba Group Holding Limited.
-//! 
+//!
 //! Licensed under the Apache License, Version 2.0 (the "License");
 //! you may not use this file except in compliance with the License.
 //! You may obtain a copy of the License at
-//! 
+//!
 //! http://www.apache.org/licenses/LICENSE-2.0
-//! 
+//!
 //! Unless required by applicable law or agreed to in writing, software
 //! distributed under the License is distributed on an "AS IS" BASIS,
 //! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -91,16 +91,32 @@ pub enum Events {
 impl Encode for Events {
     fn write_to<W: WriteExt>(&self, writer: &mut W) -> ::std::io::Result<()> {
         match self {
-            &Events::Batched(ref events) => events.write_to(writer),
-            _ => unimplemented!("[Unreachable]"),
+            &Events::Batched(ref events) => {
+                writer.write_u8(0)?;
+                events.write_to(writer)
+            },
+            &Events::Single(ref event) => {
+                writer.write_u8(1)?;
+                event.write_to(writer)
+            }
         }
     }
 }
 
 impl Decode for Events {
     fn read_from<R: ReadExt>(reader: &mut R) -> ::std::io::Result<Self> {
-        let batched = EventBatch::read_from(reader)?;
-        Ok(Events::Batched(batched))
+        let e = reader.read_u8()?;
+        match e {
+            0 => {
+                let batched = EventBatch::read_from(reader)?;
+                Ok(Events::Batched(batched))
+            }
+            1 => {
+                let event = Event::read_from(reader)?;
+                Ok(Events::Single(event))
+            }
+            _ => Err(::std::io::Error::new(::std::io::ErrorKind::Other, "unreachable"))
+        }
     }
 }
 

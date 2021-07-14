@@ -18,159 +18,193 @@ mod common;
 #[cfg(test)]
 mod test {
     use crate::common::test::*;
+    use dyn_type::Object;
+    use gremlin_core::process::traversal::traverser::Requirement;
+    use gremlin_core::structure::{PropKey, Tag};
 
     // g.V().outE().inV()
     #[test]
     fn inv_step_test_01() {
+        initialize();
         let mut expected = to_global_ids(vec![2, 3, 3, 3, 4, 5]);
         expected.sort();
-        initialize();
         let test_job_factory = TestJobFactory::with_expect_ids(expected);
-        let service = start_test_service(test_job_factory);
         let pb_request = read_pb_request(gen_path("inv_step_test_01")).expect("read pb failed");
-        submit_query(&service, pb_request);
+        run_test(test_job_factory, pb_request);
     }
 
     // g.V().inE().outV()
     #[test]
     fn outv_step_test_01() {
+        initialize();
         let mut expected = to_global_ids(vec![1, 1, 1, 4, 4, 6]);
         expected.sort();
-        initialize();
         let test_job_factory = TestJobFactory::with_expect_ids(expected);
-        let service = start_test_service(test_job_factory);
         let pb_request = read_pb_request(gen_path("outv_step_test_01")).expect("read pb failed");
-        submit_query(&service, pb_request);
+        run_test(test_job_factory, pb_request);
     }
 
     // g.V().path()
     #[test]
-    #[ignore]
-    // TODO: expected value
     fn path_step_test_01() {
-        let expected = vec![];
         initialize();
-        let test_job_factory = TestJobFactory::with_expect_values(expected);
-        let service = start_test_service(test_job_factory);
+        let expected = vec![
+            to_global_ids(vec![1]),
+            to_global_ids(vec![2]),
+            to_global_ids(vec![3]),
+            to_global_ids(vec![4]),
+            to_global_ids(vec![5]),
+            to_global_ids(vec![6]),
+        ];
+        let mut test_job_factory = TestJobFactory::with_expect_path_result(expected);
+        test_job_factory.set_requirement(Requirement::PATH);
         let pb_request = read_pb_request(gen_path("path_step_test_01")).expect("read pb failed");
-        submit_query(&service, pb_request);
+        run_test(test_job_factory, pb_request);
     }
 
-    // g.V().as("a").select("a").by(id)
+    // g.V().order().by("id").as("a").select("a").by(id)
     #[test]
-    #[ignore]
-    // TODO: expected value
     fn select_step_test_01() {
-        let expected = vec![];
         initialize();
-        let test_job_factory = TestJobFactory::with_expect_values(expected);
-        let service = start_test_service(test_job_factory);
+        let expected: Vec<Vec<(Tag, Vec<(PropKey, Object)>)>> = vec![1, 2, 3, 4, 5, 6]
+            .into_iter()
+            .map(|id| vec![(0 as Tag, vec![("".into(), (to_global_id(id) as i64).into())])])
+            .collect();
+        let mut test_job_factory = TestJobFactory::with_expect_get_properties(expected);
+        test_job_factory.set_requirement(Requirement::LABELED_PATH);
         let pb_request = read_pb_request(gen_path("select_step_test_01")).expect("read pb failed");
-        submit_query(&service, pb_request);
+        run_test(test_job_factory, pb_request);
     }
 
-    // g.V().as("a").select("a").by(label)
+    // g.V().order().by("id").as("a").select("a").by(label)
     #[test]
-    #[ignore]
-    // TODO: expected value
     fn select_step_test_02() {
-        let expected = vec![];
         initialize();
-        let test_job_factory = TestJobFactory::with_expect_values(expected);
-        let service = start_test_service(test_job_factory);
+        let expected: Vec<Vec<(Tag, Vec<(PropKey, Object)>)>> = vec![0, 0, 1, 0, 1, 0]
+            .into_iter()
+            .map(|label_id| vec![(0 as Tag, vec![("".into(), label_id.into())])])
+            .collect();
+        let mut test_job_factory = TestJobFactory::with_expect_get_properties(expected);
+        test_job_factory.set_requirement(Requirement::LABELED_PATH);
         let pb_request = read_pb_request(gen_path("select_step_test_02")).expect("read pb failed");
-        submit_query(&service, pb_request);
+        run_test(test_job_factory, pb_request);
     }
 
-    // g.V().as("a").select("a").by("id")
+    // g.V().order().by("id").as("a").select("a").by("id")
     #[test]
-    #[ignore]
-    // TODO: expected value
     fn select_step_test_03() {
-        let expected = vec![];
         initialize();
-        let test_job_factory = TestJobFactory::with_expect_values(expected);
-        let service = start_test_service(test_job_factory);
+        let expected: Vec<Vec<(Tag, Vec<(PropKey, Object)>)>> = vec![1, 2, 3, 4, 5, 6]
+            .into_iter()
+            .map(|id| vec![(0 as Tag, vec![("".into(), id.into())])])
+            .collect();
+        let mut test_job_factory = TestJobFactory::with_expect_get_properties(expected);
+        test_job_factory.set_requirement(Requirement::LABELED_PATH);
         let pb_request = read_pb_request(gen_path("select_step_test_03")).expect("read pb failed");
-        submit_query(&service, pb_request);
+        run_test(test_job_factory, pb_request);
     }
 
-    // g.V().as("a").select("a").by(valueMap("id","name"))
+    // g.V().hasLabel("SOFTWARE").order().by("id").as("a").select("a").by(valueMap("id","name"))
     #[test]
-    #[ignore]
-    // TODO: expected value
     fn select_step_test_04() {
-        let expected = vec![];
         initialize();
-        let test_job_factory = TestJobFactory::with_expect_values(expected);
-        let service = start_test_service(test_job_factory);
+        let expected: Vec<Vec<(Tag, Vec<(PropKey, Object)>)>> = vec![
+            vec![(0, vec![("id".into(), 3.into()), ("name".into(), "lop".into())])],
+            vec![(0, vec![("id".into(), 5.into()), ("name".into(), "ripple".into())])],
+        ];
+        let mut test_job_factory = TestJobFactory::with_expect_get_properties(expected);
+        test_job_factory.set_requirement(Requirement::LABELED_PATH);
         let pb_request = read_pb_request(gen_path("select_step_test_04")).expect("read pb failed");
-        submit_query(&service, pb_request);
+        run_test(test_job_factory, pb_request);
     }
 
-    // g.V().groupCount().select(keys)
+    // g.V().as("a").hasLabel("SOFTWARE").order().by("id").as("b").select("a","b").by("id").by("name")
     #[test]
-    #[ignore]
-    // TODO: expected value
     fn select_step_test_05() {
-        let expected = vec![];
         initialize();
-        let test_job_factory = TestJobFactory::with_expect_values(expected);
-        let service = start_test_service(test_job_factory);
+        let expected: Vec<Vec<(Tag, Vec<(PropKey, Object)>)>> = vec![
+            vec![(0, vec![("".into(), 3.into())]), (1, vec![("".into(), "lop".into())])],
+            vec![(0, vec![("".into(), 5.into())]), (1, vec![("".into(), "ripple".into())])],
+        ];
+        let mut test_job_factory = TestJobFactory::with_expect_get_properties(expected);
+        test_job_factory.set_requirement(Requirement::LABELED_PATH);
         let pb_request = read_pb_request(gen_path("select_step_test_05")).expect("read pb failed");
-        submit_query(&service, pb_request);
+        run_test(test_job_factory, pb_request);
     }
 
-    // g.V().groupCount().select(values)
+    // g.V().as("a").hasLabel("SOFTWARE").order().by("id").as("b").select("a","b").by("id").by(valueMap("id","name"))
     #[test]
-    #[ignore]
-    // TODO: expected value
-    fn select_step_test_06() {
-        let expected = vec![];
+    fn select_step_test_6() {
         initialize();
-        let test_job_factory = TestJobFactory::with_expect_values(expected);
-        let service = start_test_service(test_job_factory);
+        let expected: Vec<Vec<(Tag, Vec<(PropKey, Object)>)>> = vec![
+            vec![
+                (0, vec![("".into(), 3.into())]),
+                (1, vec![("id".into(), 3.into()), ("name".into(), "lop".into())]),
+            ],
+            vec![
+                (0, vec![("".into(), 5.into())]),
+                (1, vec![("id".into(), 5.into()), ("name".into(), "ripple".into())]),
+            ],
+        ];
+        let mut test_job_factory = TestJobFactory::with_expect_get_properties(expected);
+        test_job_factory.set_requirement(Requirement::LABELED_PATH);
         let pb_request = read_pb_request(gen_path("select_step_test_06")).expect("read pb failed");
-        submit_query(&service, pb_request);
+        run_test(test_job_factory, pb_request);
     }
 
-    // select tag where tag refers to a value
+    // g.V().groupCount().unfold().select(keys).order()
+    #[test]
+    fn select_step_test_07() {
+        initialize();
+        let mut expected = to_global_ids(vec![1, 2, 3, 4, 5, 6]);
+        expected.sort();
+        let test_job_factory = TestJobFactory::with_expect_ids(expected);
+        let pb_request = read_pb_request(gen_path("select_step_test_07")).expect("read pb failed");
+        run_test(test_job_factory, pb_request);
+    }
+
+    // g.V().groupCount().unfold().select(values).order()
+    #[test]
+    fn select_step_test_08() {
+        initialize();
+        let expected = vec![1.into(), 1.into(), 1.into(), 1.into(), 1.into(), 1.into()];
+        let test_job_factory = TestJobFactory::with_expect_values(expected);
+        let pb_request = read_pb_request(gen_path("select_step_test_08")).expect("read pb failed");
+        run_test(test_job_factory, pb_request);
+    }
+
     // g.V().values("id").as("a").select("a")
     #[test]
-    #[ignore]
-    // TODO: expected value
-    fn select_step_test_07() {
-        let expected = vec![];
+    fn select_step_test_09() {
         initialize();
-        let test_job_factory = TestJobFactory::with_expect_values(expected);
-        let service = start_test_service(test_job_factory);
-        let pb_request = read_pb_request(gen_path("select_step_test_07")).expect("read pb failed");
-        submit_query(&service, pb_request);
+        let expected = vec![1.into(), 2.into(), 3.into(), 4.into(), 5.into(), 6.into()];
+        let mut test_job_factory = TestJobFactory::with_expect_values(expected);
+        test_job_factory.set_requirement(Requirement::LABELED_PATH);
+        let pb_request = read_pb_request(gen_path("select_step_test_09")).expect("read pb failed");
+        run_test(test_job_factory, pb_request);
     }
 
     // g.V().as("a").select("a")
     #[test]
-    fn select_step_test_08() {
+    fn select_step_test_10() {
+        initialize();
         let mut expected = to_global_ids(vec![1, 2, 3, 4, 5, 6]);
         expected.sort();
-        initialize();
-        let test_job_factory = TestJobFactory::with_expect_ids(expected);
-        let service = start_test_service(test_job_factory);
-        let pb_request = read_pb_request(gen_path("select_step_test_08")).expect("read pb failed");
-        submit_query(&service, pb_request);
+        let mut test_job_factory = TestJobFactory::with_expect_ids(expected);
+        test_job_factory.set_requirement(Requirement::LABELED_PATH);
+        let pb_request = read_pb_request(gen_path("select_step_test_10")).expect("read pb failed");
+        run_test(test_job_factory, pb_request);
     }
 
     // g.V().path().count(local)
     #[test]
-    #[ignore]
-    // TODO: expected value
     fn path_count_step_test_01() {
-        let expected = vec![];
         initialize();
-        let test_job_factory = TestJobFactory::with_expect_values(expected);
-        let service = start_test_service(test_job_factory);
+        let expected = vec![1.into(), 1.into(), 1.into(), 1.into(), 1.into(), 1.into()];
+        let mut test_job_factory = TestJobFactory::with_expect_values(expected);
+        test_job_factory.set_requirement(Requirement::PATH);
         let pb_request =
             read_pb_request(gen_path("path_count_step_test_01")).expect("read pb failed");
-        submit_query(&service, pb_request);
+        run_test(test_job_factory, pb_request);
     }
 }

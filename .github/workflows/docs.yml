@@ -15,10 +15,8 @@ jobs:
     - name: Cpp Format and Lint Check
       run: |
         # install clang-format
-        if [ ! -f /usr/bin/clang-format ]; then
-            sudo curl -L https://github.com/muttleyxd/clang-tools-static-binaries/releases/download/master-22538c65/clang-format-8_linux-amd64 --output /usr/bin/clang-format
-            sudo chmod +x /usr/bin/clang-format
-        fi
+        sudo curl -L https://github.com/muttleyxd/clang-tools-static-binaries/releases/download/master-22538c65/clang-format-8_linux-amd64 --output /usr/bin/clang-format
+        sudo chmod +x /usr/bin/clang-format
 
         # run format
         cd analytical_engine/
@@ -90,6 +88,8 @@ jobs:
         git config user.email github-actions@github.com
         git config user.name github-actions
 
+        tag=$(git describe --exact-match --tags HEAD 2>/dev/null || true)
+
         git fetch origin gh-pages --no-recurse-submodules
         git checkout gh-pages
 
@@ -101,8 +101,6 @@ jobs:
             rm -rf latest
             cp -R _build/latest/html ./latest
         else
-            tag=$(git describe --exact-match --tags HEAD)
-
             rm -rf latest
             cp -R _build/${tag}/html ./latest
 

@@ -1,12 +1,12 @@
 //
 //! Copyright 2020 Alibaba Group Holding Limited.
-//! 
+//!
 //! Licensed under the Apache License, Version 2.0 (the "License");
 //! you may not use this file except in compliance with the License.
 //! You may obtain a copy of the License at
-//! 
+//!
 //! http://www.apache.org/licenses/LICENSE-2.0
-//! 
+//!
 //! Unless required by applicable law or agreed to in writing, software
 //! distributed under the License is distributed on an "AS IS" BASIS,
 //! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +26,7 @@ use crate::data::DataSet;
 use crate::errors::IOResult;
 use crate::event::EventKind;
 use crate::graph::Port;
-use crate::tag::tools::{BlockGuard, TagAntiChainSet, TagTree};
+use crate::tag::tools::{BlockGuard, TagAntiChainSet};
 use crate::{Data, Tag};
 
 use crossbeam_channel::{Receiver, Sender};
@@ -151,20 +151,21 @@ impl<D: Data> OutputHandle<D> {
 
     pub fn close_scopes(&mut self) -> IOResult<()> {
         if !self.poisoned {
-            let mut fold = TagTree::new();
+            let mut ends = vec![];
             match self.delta {
                 OutputDelta::None | OutputDelta::ToChild => {
                     for end in self.end_scopes.take_fronts().drain(..) {
-                        fold.add_node(end);
+                        //fold.add_node(end);
+                        ends.push(end);
                     }
                 }
                 OutputDelta::Advance => {
                     for mut end in self.end_scopes.take_fronts().drain(..) {
                         if end.len() == self.scope_depth {
-                            end.advance_unchecked();
+                            end = end.advance();
                         }
                         // trace!("[worker_{:?}] close scope {:?} on port {:?}", self.tee.worker, end, self.port);
-                        fold.add_node(end);
+                        ends.push(end);
                     }
                 }
                 OutputDelta::ToParent(n) => {
@@ -173,13 +174,11 @@ impl<D: Data> OutputHandle<D> {
                     for end in self.end_scopes.take_fronts().drain(..) {
                         if end.len() <= n {
                             // trace!("[worker_{:?}] close scope {:?} on port {:?}", self.tee.worker, end, self.port);
-                            fold.add_node(end);
+                            ends.push(end);
                         }
                     }
                 }
             }
-            let mut ends = vec![];
-            fold.fold_into(&mut ends);
             for e in ends {
                 if e.len() >= self.scope_depth && self.global_scope_ends.remove(&e) {
                     self.tee.give_global_end(e)?;
@@ -208,11 +207,7 @@ impl<D: Data> OutputHandle<D> {
     pub fn evolve_output(&self, tag: &Tag) -> Tag {
         match self.delta {
             OutputDelta::None => tag.clone(),
-            OutputDelta::Advance => {
-                let mut tag = tag.clone();
-                tag.advance_unchecked();
-                tag
-            }
+            OutputDelta::Advance => tag.advance(),
             OutputDelta::ToParent(n) => {
                 let mut tag = tag.clone();
                 let n = n as usize;

@@ -1,12 +1,12 @@
 //
 //! Copyright 2020 Alibaba Group Holding Limited.
-//! 
+//!
 //! Licensed under the Apache License, Version 2.0 (the "License");
 //! you may not use this file except in compliance with the License.
 //! You may obtain a copy of the License at
-//! 
+//!
 //! http://www.apache.org/licenses/LICENSE-2.0
-//! 
+//!
 //! Unless required by applicable law or agreed to in writing, software
 //! distributed under the License is distributed on an "AS IS" BASIS,
 //! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,7 @@
 use crate::data_plane::{GeneralPull, GeneralPush, Pull, Push};
 use crate::errors::{BuildJobError, IOResult};
 use crate::event::io::{EventBatch, EventBus, Events};
-use crate::event::Event;
+use crate::event::{Event, EventKind};
 use crate::{JobConf, WorkerId};
 use crossbeam_channel::{Receiver, TryRecvError};
 use pegasus_common::rc::RcPointer;
@@ -45,15 +45,25 @@ impl EventPush {
 impl Push<Event> for EventPush {
     #[inline]
     fn push(&mut self, msg: Event) -> IOResult<()> {
-        if let Some(mut buffer) = self.buffer.take() {
-            buffer.push(msg);
-            if buffer.len() == 64 {
-                let batch = std::mem::replace(&mut buffer, EventBatch::new());
-                self.inner.push(Events::Batched(batch))?;
+        match msg.kind {
+            EventKind::Discard(_) => {
+                if let Err(e) = self.inner.push(Events::Single(msg)) {
+                    // ignore the error of pushing discard events
+                    info_worker!("Ignore pushing event failure {:?}, because the target worker has already exited", e);
+                }
             }
-            self.buffer.replace(buffer);
-        } else {
-            self.inner.push(Events::Single(msg))?;
+            _ => {
+                if let Some(mut buffer) = self.buffer.take() {
+                    buffer.push(msg);
+                    if buffer.len() == 64 {
+                        let batch = std::mem::replace(&mut buffer, EventBatch::new());
+                        self.inner.push(Events::Batched(batch))?;
+                    }
+                    self.buffer.replace(buffer);
+                } else {
+                    self.inner.push(Events::Single(msg))?;
+                }
+            }
         }
         Ok(())
     }

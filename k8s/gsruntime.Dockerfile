@@ -4,8 +4,13 @@
 FROM centos:7
 
 # yum install gcc7, cat not merge in one layer
-RUN yum install -y centos-release-scl && yum clean all && rm -fr /var/cache/yum
-RUN yum install -y devtoolset-7-gcc-* && yum clean all && rm -fr /var/cache/yum
+RUN yum install -y centos-release-scl && \
+    yum clean all && \
+    rm -fr /var/cache/yum
+RUN yum install -y devtoolset-7-gcc-* \
+                   devtoolset-7-libasan-devel.x86_64 && \
+    yum clean all && \
+    rm -fr /var/cache/yum
 RUN echo "source scl_source enable devtoolset-7" >> /etc/bashrc && source /etc/bashrc
 SHELL ["/usr/bin/scl", "enable", "devtoolset-7"]
 
@@ -13,11 +18,13 @@ RUN yum install -y epel-release && \
     yum clean all && \
     rm -fr /var/cache/yum
 
+RUN yum install -y https://packages.endpoint.com/rhel/7/os/x86_64/endpoint-repo-1.7-1.x86_64.rpm
+
 # yum install dependencies
 RUN yum install -y autoconf automake double-conversion-devel git \
         libcurl-devel libevent-devel libgsasl-devel librdkafka-devel libunwind-devel.x86_64 \
         libuuid-devel libxml2-devel libzip libzip-devel m4 minizip minizip-devel \
-        make net-tools openssl-devel python3-devel rsync telnet tools unzip vim wget which zip && \
+        make net-tools openssl-devel python3-devel rsync telnet tools unzip vim wget which zip bind-utils && \
     yum clean all && \
     rm -fr /var/cache/yum
 
@@ -92,8 +99,8 @@ RUN cd /tmp && \
 
 # boost v1.73.0
 RUN cd /tmp && \
-    wget https://dl.bintray.com/boostorg/release/1.73.0/source/boost_1_73_0.tar.gz && \
-    tar zxvf boost_1_73_0.tar.gz && \
+    wget https://boostorg.jfrog.io/artifactory/main/release/1.73.0/source/boost_1_73_0.tar.gz && \
+    tar zxf boost_1_73_0.tar.gz && \
     cd boost_1_73_0 && \
     ./bootstrap.sh && \
     ./b2 install link=shared runtime-link=shared variant=release threading=multi || true && \
@@ -257,17 +264,40 @@ RUN cd /tmp && \
 # GIE RUNTIME
 
 # Install java and maven
-RUN yum install -y perl java-1.8.0-openjdk-devel maven && \
+RUN yum install -y perl java-1.8.0-openjdk-devel && \
     yum clean all && \
     rm -fr /var/cache/yum
 
+# install hadoop
+RUN cd /tmp && \
+    wget https://archive.apache.org/dist/hadoop/core/hadoop-2.8.4/hadoop-2.8.4.tar.gz && \
+    tar zxf hadoop-2.8.4.tar.gz -C /usr/local && \
+    rm -rf hadoop-2.8.4.tar.gz
+
+ENV JAVA_HOME /usr/lib/jvm/java
 ENV HADOOP_HOME /usr/local/hadoop-2.8.4
 ENV HADOOP_CONF_DIR $HADOOP_HOME/etc/hadoop
-ENV CLASSPATH $HADOOP_CONF_DIR:$CLASSPATH
+ENV HADOOP_COMMON_LIB_NATIVE_DIR $HADOOP_HOME/lib/native
+
 ENV PATH $PATH:$HADOOP_HOME/bin
 
+RUN bash -l -c 'echo export CLASSPATH="$($HADOOP_HOME/bin/hdfs classpath --glob)" >> /etc/bashrc'
+
 # Prepare and set workspace
-RUN mkdir -p /root/maxgraph
+RUN mkdir -p /root/maxgraph \
+    && mkdir -p /tmp/maven /usr/share/maven/ref \
+    && curl -fsSL -o /tmp/apache-maven.tar.gz https://apache.osuosl.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz \
+    && tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1 \
+    && rm -f /tmp/apache-maven.tar.gz \
+    && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn \
+    && export LD_LIBRARY_PATH=$(echo "$LD_LIBRARY_PATH" | sed "s/::/:/g") \
+    && wget http://mirrors.ustc.edu.cn/gnu/libc/glibc-2.18.tar.gz \
+    && tar -zxf glibc-2.18.tar.gz \
+    && cd glibc-2.18 \
+    && mkdir build && cd build \
+    && ../configure --prefix=/usr \
+    && make -j4 \
+    && make install 
 
 # patchelf for wheel packaging
 RUN cd /tmp && \
@@ -284,4 +314,9 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo '$TZ' > /etc/timezone
 
 # for programming output
-ENV LC_ALL=C
+RUN localedef -c -f UTF-8 -i en_US en_US.UTF-8
+ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8'
+
+ENV PATH=${PATH}:/usr/local/go/bin
+ENV RUST_BACKTRACE=1
+

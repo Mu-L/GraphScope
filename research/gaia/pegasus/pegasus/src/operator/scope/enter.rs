@@ -1,12 +1,12 @@
 //
 //! Copyright 2020 Alibaba Group Holding Limited.
-//! 
+//!
 //! Licensed under the Apache License, Version 2.0 (the "License");
 //! you may not use this file except in compliance with the License.
 //! You may obtain a copy of the License at
-//! 
+//!
 //! http://www.apache.org/licenses/LICENSE-2.0
-//! 
+//!
 //! Unless required by applicable law or agreed to in writing, software
 //! distributed under the License is distributed on an "AS IS" BASIS,
 //! WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,16 +27,48 @@ use crate::{Data, Tag};
 use hibitset::BitSet;
 use std::collections::{HashMap, HashSet, VecDeque};
 
-struct EnterScopeOperator<D, F> {
+struct DefaultEnterOperator<D> {
+    _ph: std::marker::PhantomData<D>,
+}
+
+impl<D> DefaultEnterOperator<D> {
+    fn new() -> Self {
+        DefaultEnterOperator { _ph: std::marker::PhantomData }
+    }
+}
+
+impl<D: Data> OperatorCore for DefaultEnterOperator<D> {
+    fn on_receive(
+        &mut self, tag: &Tag, inputs: &[Box<dyn InputProxy>], outputs: &[Box<dyn OutputProxy>],
+    ) -> Result<FiredState, JobExecError> {
+        let mut input = new_input_session::<D>(&inputs[0], tag);
+        let mut output = new_output_session::<D>(&outputs[0], tag);
+        input.for_each_batch(|dataset| {
+            output.forward(dataset)?;
+            Ok(())
+        })?;
+        Ok(FiredState::Idle)
+    }
+
+    fn on_notify(
+        &mut self, n: Notification, outputs: &[Box<dyn OutputProxy>],
+    ) -> Result<(), JobExecError> {
+        let tag = Tag::inherit(&n.tag, 0);
+        outputs[0].scope_end(tag);
+        Ok(())
+    }
+}
+
+struct DynEnterScopeOperator<D, F> {
     completes: HashMap<Tag, IdSet>,
     func: Option<F>,
     emits: HashMap<Tag, F>,
     _ph: std::marker::PhantomData<D>,
 }
 
-impl<D, F> EnterScopeOperator<D, F> {
+impl<D, F> DynEnterScopeOperator<D, F> {
     pub fn new(func: Option<F>) -> Self {
-        EnterScopeOperator {
+        DynEnterScopeOperator {
             completes: HashMap::new(),
             func,
             emits: HashMap::new(),
@@ -59,21 +91,7 @@ impl<D, F> EnterScopeOperator<D, F> {
     }
 }
 
-#[derive(Clone)]
-struct NullEmitter;
-
-impl<D: Send> ScopeInputEmitter<D> for NullEmitter {
-    fn get_scope(&mut self, _: D) -> Option<ScopeInput<D>> {
-        unreachable!();
-    }
-}
-
-#[inline]
-fn default_enter<D: Send>() -> EnterScopeOperator<D, NullEmitter> {
-    EnterScopeOperator::<D, NullEmitter>::new(None)
-}
-
-impl<D, F> OperatorCore for EnterScopeOperator<D, F>
+impl<D, F> OperatorCore for DynEnterScopeOperator<D, F>
 where
     D: Data,
     F: ScopeInputEmitter<D>,
@@ -140,9 +158,10 @@ impl<D: Data> EnterScope<D> for Stream<D> {
     fn enter(&self) -> Result<Stream<D>, BuildJobError> {
         Ok(self
             .concat("enter", Pipeline, |meta| {
+                meta.enable_notify();
                 meta.set_kind(OperatorKind::Map);
                 meta.set_output_delta(OutputDelta::ToChild);
-                Box::new(default_enter::<D>())
+                Box::new(DefaultEnterOperator::<D>::new())
             })?
             .enter_scope())
     }
@@ -158,7 +177,7 @@ impl<D: Data> EnterScope<D> for Stream<D> {
                 meta.set_output_delta(OutputDelta::ToChild);
                 meta.enable_notify();
                 let func = builder(meta);
-                Box::new(EnterScopeOperator::<D, F>::new(Some(func)))
+                Box::new(DynEnterScopeOperator::<D, F>::new(Some(func)))
             })?
             .enter_scope())
     }

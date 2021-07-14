@@ -13,56 +13,18 @@
 //! See the License for the specific language governing permissions and
 //! limitations under the License.
 
-use crate::process::traversal::step::util::StepSymbol;
-use crate::process::traversal::step::{MapFuncGen, RemoveLabel, Step};
+use crate::generated::gremlin as pb;
+use crate::process::traversal::step::MapFuncGen;
 use crate::process::traversal::traverser::Traverser;
-use crate::structure::{QueryParams, Tag, Vertex, VertexOrEdge};
-use crate::{str_to_dyn_error, DynResult};
+use crate::structure::{QueryParams, Vertex, VertexOrEdge};
+use crate::{str_to_dyn_error, DynResult, FromPb};
 use bit_set::BitSet;
 use pegasus::api::function::{FnResult, MapFunction};
 
-pub struct IdentityStep {
-    pub params: QueryParams<Vertex>,
-    as_labels: Vec<Tag>,
-    remove_labels: Vec<Tag>,
-}
-
-impl IdentityStep {
-    pub fn new(props: Option<Vec<String>>) -> Self {
-        let mut params = QueryParams::new();
-        params.props = props;
-        IdentityStep { params, as_labels: vec![], remove_labels: vec![] }
-    }
-}
-
 struct IdentityFunc {
     params: QueryParams<Vertex>,
-    labels: BitSet,
-    remove_labels: BitSet,
-}
-
-impl Step for IdentityStep {
-    fn get_symbol(&self) -> StepSymbol {
-        StepSymbol::Identity
-    }
-
-    fn add_tag(&mut self, label: Tag) {
-        self.as_labels.push(label);
-    }
-
-    fn tags(&self) -> &[Tag] {
-        self.as_labels.as_slice()
-    }
-}
-
-impl RemoveLabel for IdentityStep {
-    fn remove_tag(&mut self, label: Tag) {
-        self.remove_labels.push(label);
-    }
-
-    fn remove_tags(&self) -> &[Tag] {
-        self.remove_labels.as_slice()
-    }
+    tags: BitSet,
+    remove_tags: BitSet,
 }
 
 // runtime identity step is used in the following scenarios:
@@ -73,48 +35,42 @@ impl RemoveLabel for IdentityStep {
 // 5. Give hint of tags to remove. Since we may not able to remove tags in some OpKind, e.g., Filter, Sort, Group, etc, we add identity (map step) to remove tags.
 impl MapFunction<Traverser, Traverser> for IdentityFunc {
     fn exec(&self, mut input: Traverser) -> FnResult<Traverser> {
-        if let Some(elem) = input.get_element() {
+        if let Some(elem) = input.get_element_mut() {
             if self.params.props.is_some() {
                 // the case of preserving some properties in vertex in previous
-                match elem.get() {
-                    VertexOrEdge::V(v) => {
+                match elem.get_mut() {
+                    VertexOrEdge::V(ori_v) => {
                         // the case of preserving properties on demand for vertex
-                        let id = v.id;
+                        let id = ori_v.id;
                         let graph = crate::get_graph().unwrap();
                         let mut r = graph.get_vertex(&[id], &self.params)?;
                         if let Some(v) = r.next() {
-                            input.modify_head(v, &self.labels);
-                            input.remove_labels(&self.remove_labels);
+                            *ori_v = v;
+                            input.add_tags(&self.tags);
+                            input.remove_tags(&self.remove_tags);
                             Ok(input)
                         } else {
                             Err(str_to_dyn_error(&format!("vertex with id {} not found", id)))
                         }
                     }
                     // TODO: there is no need to add identity after edge, check with Compiler
-                    VertexOrEdge::E(_e) => {
+                    VertexOrEdge::E(_ori_e) => {
                         // the case that we assume all properties are already preserved for edge, so we do not query the edges
-                        if !self.labels.is_empty() {
-                            input.add_labels(&self.labels);
-                        }
-                        input.remove_labels(&self.remove_labels);
+                        input.add_tags(&self.tags);
+                        input.remove_tags(&self.remove_tags);
                         Ok(input)
                     }
                 }
             } else {
                 // the case of identity step
-                // TODO: check with compiler when do this
-                if !self.labels.is_empty() {
-                    input.add_labels(&self.labels);
-                }
-                input.remove_labels(&self.remove_labels);
+                input.add_tags(&self.tags);
+                input.remove_tags(&self.remove_tags);
                 Ok(input)
             }
         } else if let Some(_) = input.get_object() {
             // the case of as step, e.g., g.V().count().as("a")
-            if !self.labels.is_empty() {
-                input.add_labels(&self.labels);
-            }
-            input.remove_labels(&self.remove_labels);
+            input.add_tags(&self.tags);
+            input.remove_tags(&self.remove_tags);
             Ok(input)
         } else {
             Err(str_to_dyn_error("invalid head in identity"))
@@ -122,11 +78,15 @@ impl MapFunction<Traverser, Traverser> for IdentityFunc {
     }
 }
 
+pub struct IdentityStep {
+    pub step: pb::IdentityStep,
+    pub tags: BitSet,
+    pub remove_tags: BitSet,
+}
+
 impl MapFuncGen for IdentityStep {
-    fn gen(&self) -> DynResult<Box<dyn MapFunction<Traverser, Traverser>>> {
-        let labels = self.get_tags();
-        let params = self.params.clone();
-        let remove_labels = self.get_remove_tags();
-        Ok(Box::new(IdentityFunc { params, labels, remove_labels }))
+    fn gen_map(self) -> DynResult<Box<dyn MapFunction<Traverser, Traverser>>> {
+        let params = QueryParams::from_pb(self.step.query_params)?;
+        Ok(Box::new(IdentityFunc { params, tags: self.tags, remove_tags: self.remove_tags }))
     }
 }

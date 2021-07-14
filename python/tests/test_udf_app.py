@@ -922,17 +922,17 @@ def test_load_app_from_gar(
 ):
     # file not exist, also works with permission denied
     with pytest.raises(FileNotFoundError, match="No such file or directory"):
-        ast1 = load_app("sssp", not_exist_gar)
+        ast1 = load_app("SSSP_Pregel", not_exist_gar)
     # not a zip file
     with pytest.raises(ValueError, match="not a zip file"):
-        ast2 = load_app("sssp", non_zipfile_gar)
+        ast2 = load_app("SSSP_Pregel", non_zipfile_gar)
     # type error
     with pytest.raises(ValueError, match="Wrong type"):
-        ast3 = load_app("sssp", [1, 2, 3, 4])
+        ast3 = load_app("SSSP_Pregel", [1, 2, 3, 4])
     with pytest.raises(ValueError, match="Wrong type"):
-        ast4 = load_app("sssp", gar=None)
+        ast4 = load_app("SSSP_Pregel", gar=None)
     SSSP_Pregel.to_gar(random_gar)
-    ast1 = load_app("sssp", random_gar)
+    ast1 = load_app("SSSP_Pregel", random_gar)
     assert isinstance(ast1, AppAssets)
 
 
@@ -954,7 +954,7 @@ def test_create_cython_app(
 
 
 @pytest.mark.skipif(
-    os.environ.get("EXPERIMENTAL_ON") != "ON", reason="dynamic graph is in experimental"
+    os.environ.get("NETWORKX") != "ON", reason="dynamic graph is in NETWORKX ON"
 )
 def test_error_on_create_cython_app(
     graphscope_session, dynamic_property_graph, dynamic_project_graph, random_gar
@@ -975,18 +975,18 @@ def test_get_schema(graphscope_session, arrow_property_graph):
     ctx1 = a1(arrow_property_graph)
     r1 = ctx1.to_numpy("r:v0", vertex_range={"begin": 0, "end": 7})
     assert r1.tolist() == [
-        "v0,v1,weight,DOUBLE,id,LONG,e0,weight,LONG,e1,weight,LONG,",
-        "v0,v1,weight,DOUBLE,id,LONG,e0,weight,LONG,e1,weight,LONG,",
-        "v0,v1,weight,DOUBLE,id,LONG,e0,weight,LONG,e1,weight,LONG,",
+        "v0,v1,dist,DOUBLE,id,LONG,e0,weight,LONG,e1,weight,LONG,",
+        "v0,v1,dist,DOUBLE,id,LONG,e0,weight,LONG,e1,weight,LONG,",
+        "v0,v1,dist,DOUBLE,id,LONG,e0,weight,LONG,e1,weight,LONG,",
     ]
     # pie
     a2 = PIE_GetSchema()
     ctx2 = a2(arrow_property_graph)
     r2 = ctx2.to_numpy("r:v0", vertex_range={"begin": 0, "end": 7})
     assert r2.tolist() == [
-        "v0,v1,weight,DOUBLE,id,LONG,e0,weight,LONG,e1,weight,LONG,",
-        "v0,v1,weight,DOUBLE,id,LONG,e0,weight,LONG,e1,weight,LONG,",
-        "v0,v1,weight,DOUBLE,id,LONG,e0,weight,LONG,e1,weight,LONG,",
+        "v0,v1,dist,DOUBLE,id,LONG,e0,weight,LONG,e1,weight,LONG,",
+        "v0,v1,dist,DOUBLE,id,LONG,e0,weight,LONG,e1,weight,LONG,",
+        "v0,v1,dist,DOUBLE,id,LONG,e0,weight,LONG,e1,weight,LONG,",
     ]
 
 
@@ -1093,9 +1093,9 @@ def test_vertex_traversal(arrow_property_graph, twitter_v_0, twitter_v_1):
     def compare_result(df, result_file):
         id_col = df["node"].astype("int64")
         df = (
-            pd.DataFrame(df.r.str.split(",").tolist(), columns=["weight", "id"])
-            .reindex(columns=["id", "weight"])
-            .astype({"id": "int64", "weight": "float64"})
+            pd.DataFrame(df.r.str.split(",").tolist(), columns=["dist", "id"])
+            .reindex(columns=["id", "dist"])
+            .astype({"id": "int64", "dist": "float64"})
         )
         assert id_col.equals(df["id"])
 

@@ -10,8 +10,8 @@ For quickly getting started, we set up a local Kubernetes cluster and take advan
 To run GraphScope on your local computer, the following dependencies or tools are required.
 
 - Docker
-- Python 3.8 (with pip)
-- Local Kubernetes cluster set-up tool (e.g. [Kind](https://kind.sigs.k8s.io))
+- Python 3.6+ (with pip)
+- Local Kubernetes cluster set-up tool (e.g. `Kind <https://kind.sigs.k8s.io>`_)
 
 On Windows and macOS, you can follow the official guides to install them and enable Kubernetes in Docker.
 For Ubuntu/CentOS Linux distributions, we provide a script to install the above

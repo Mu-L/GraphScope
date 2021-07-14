@@ -13,65 +13,17 @@
 //! See the License for the specific language governing permissions and
 //! limitations under the License.
 
+use crate::generated::gremlin as pb;
 use crate::process::traversal::step::map::MapFuncGen;
-use crate::process::traversal::step::util::StepSymbol;
-use crate::process::traversal::step::{RemoveLabel, Step};
 use crate::process::traversal::traverser::Traverser;
-use crate::structure::{EndPointOpt, QueryParams, Tag, Vertex, VertexOrEdge};
-use crate::{str_to_dyn_error, DynResult};
+use crate::structure::{EndPointOpt, QueryParams, Vertex, VertexOrEdge};
+use crate::{str_to_dyn_error, DynResult, FromPb};
 use bit_set::BitSet;
 use pegasus::api::function::{FnResult, MapFunction};
 
-pub struct EdgeVertexStep {
-    symbol: StepSymbol,
-    pub params: QueryParams<Vertex>,
-    as_labels: Vec<Tag>,
-    remove_labels: Vec<Tag>,
-}
-
-impl EdgeVertexStep {
-    pub fn new(opt: EndPointOpt) -> Self {
-        let symbol = match opt {
-            EndPointOpt::Out => StepSymbol::OutV,
-            EndPointOpt::In => StepSymbol::InV,
-            EndPointOpt::Other => StepSymbol::OtherV,
-        };
-        EdgeVertexStep {
-            symbol,
-            params: QueryParams::new(),
-            as_labels: vec![],
-            remove_labels: vec![],
-        }
-    }
-}
-
-impl Step for EdgeVertexStep {
-    fn get_symbol(&self) -> StepSymbol {
-        self.symbol
-    }
-
-    fn add_tag(&mut self, label: Tag) {
-        self.as_labels.push(label);
-    }
-
-    fn tags(&self) -> &[Tag] {
-        &self.as_labels
-    }
-}
-
-impl RemoveLabel for EdgeVertexStep {
-    fn remove_tag(&mut self, label: Tag) {
-        self.remove_labels.push(label);
-    }
-
-    fn remove_tags(&self) -> &[Tag] {
-        self.remove_labels.as_slice()
-    }
-}
-
 struct EdgeVertexFunc {
-    labels: BitSet,
-    remove_labels: BitSet,
+    tags: BitSet,
+    remove_tags: BitSet,
     params: QueryParams<Vertex>,
     get_src: bool,
 }
@@ -85,38 +37,48 @@ impl MapFunction<Traverser, Traverser> for EdgeVertexFunc {
                     let graph = crate::get_graph().ok_or(str_to_dyn_error("Graph is None"))?;
                     let mut r = graph.get_vertex(&[id], &self.params)?;
                     if let Some(v) = r.next() {
-                        input.split(v, &self.labels);
-                        input.remove_labels(&self.remove_labels);
-                        return Ok(input);
+                        input.split(v, &self.tags);
+                        input.remove_tags(&self.remove_tags);
+
+                        Ok(input)
                     } else {
-                        return Err(str_to_dyn_error(&format!(
-                            "vertex with id {} not found",
-                            e.src_id
-                        )));
+                        Err(str_to_dyn_error(&format!("Vertex with id {} not found", id)))
                     }
                 }
-                _ => (),
+                _ => Err(str_to_dyn_error("Should not call `EdgeVertexStep` on a vertex")),
             }
+        } else {
+            Err(str_to_dyn_error("invalid input for `EdgeVertexStep`"))
         }
-
-        Err(str_to_dyn_error("invalid input for EdgeVertexStep"))
     }
 }
 
+pub struct EdgeVertexStep {
+    pub step: pb::EdgeVertexStep,
+    pub tags: BitSet,
+    pub remove_tags: BitSet,
+}
+
 impl MapFuncGen for EdgeVertexStep {
-    fn gen(&self) -> DynResult<Box<dyn MapFunction<Traverser, Traverser>>> {
-        let labels = self.get_tags();
-        let remove_labels = self.get_remove_tags();
-        let params = self.params.clone();
-        match self.symbol {
-            StepSymbol::OutV => {
-                Ok(Box::new(EdgeVertexFunc { labels, remove_labels, params, get_src: true }))
-            }
-            StepSymbol::InV => {
-                Ok(Box::new(EdgeVertexFunc { labels, remove_labels, params, get_src: false }))
-            }
-            StepSymbol::OtherV => Err(str_to_dyn_error("`otherV()` has not been supported")),
-            _ => Err(str_to_dyn_error("Invalid symbol in `EdgeVertexStep`")),
+    fn gen_map(self) -> DynResult<Box<dyn MapFunction<Traverser, Traverser>>> {
+        let step = self.step;
+        let opt_pb = unsafe { std::mem::transmute(step.endpoint_opt) };
+        let opt = EndPointOpt::from_pb(opt_pb)?;
+        let params = QueryParams::from_pb(step.query_params)?;
+        match opt {
+            EndPointOpt::Out => Ok(Box::new(EdgeVertexFunc {
+                tags: self.tags,
+                remove_tags: self.remove_tags,
+                params,
+                get_src: true,
+            }) as Box<dyn MapFunction<Traverser, Traverser>>),
+            EndPointOpt::In => Ok(Box::new(EdgeVertexFunc {
+                tags: self.tags,
+                remove_tags: self.remove_tags,
+                params,
+                get_src: false,
+            }) as Box<dyn MapFunction<Traverser, Traverser>>),
+            EndPointOpt::Other => Err(str_to_dyn_error("`otherV()` has not been supported")),
         }
     }
 }

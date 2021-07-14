@@ -29,6 +29,7 @@ from graphscope import property_bfs
 from graphscope import property_sssp
 from graphscope import sssp
 from graphscope.framework.app import AppAssets
+from graphscope.framework.errors import InvalidArgumentError
 
 
 def test_simple_context_to_numpy(simple_context):
@@ -55,7 +56,7 @@ def test_simple_context_to_vineyard_tensor(simple_context, p2p_project_directed_
     out = simple_context.to_vineyard_tensor("r")
     assert out is not None
 
-    has_path = AppAssets(algo="sssp_has_path")
+    has_path = AppAssets(algo="sssp_has_path", context="tensor")
     ctx = has_path(
         p2p_project_directed_graph._project_to_simple(), source=6, target=3728
     )
@@ -72,7 +73,7 @@ def test_simple_context_to_vineyard_dataframe(
 
 
 def test_property_context_to_numpy(property_context):
-    out = property_context.to_numpy("v:v0.weight")
+    out = property_context.to_numpy("v:v0.dist")
     assert out.shape == (40521,)
     out = property_context.to_numpy("r:v1.dist_1")
     assert out.shape == (40786,)
@@ -100,7 +101,7 @@ def test_property_context_to_vineyard_tensor(property_context):
 
 def test_property_context_to_vineyard_dataframe(graphscope_session, property_context):
     out = property_context.to_vineyard_dataframe(
-        {"id": "v:v0.id", "data": "v:v0.weight", "result": "r:v0.dist_0"}
+        {"id": "v:v0.id", "data": "v:v0.dist", "result": "r:v0.dist_0"}
     )
     assert out is not None
 
@@ -160,7 +161,10 @@ def test_error_on_selector(property_context):
         out = property_context.to_numpy("v:non_exist_label.id")
     with pytest.raises(KeyError, match="non_exist_prop"):
         out = property_context.to_numpy("v:v0.non_exist_prop")
-    with pytest.raises(RuntimeError, match="selector cannot be None"):
+    with pytest.raises(
+        InvalidArgumentError,
+        match="Selector in labeled vertex data context cannot be None",
+    ):
         out = property_context.to_numpy(selector=None)
     with pytest.raises(ValueError, match="not enough values to unpack"):
         out = property_context.to_numpy("xxx")
